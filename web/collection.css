@@ -1,0 +1,92 @@
+body.collection-exhibit { background:#eff3f4; color:#203b37; letter-spacing:0; } /* Use a neutral exhibit surface that gives photographs and labels visual priority. */
+body.collection-exhibit .topbar { background:#163e35; box-shadow:none; } /* Keep branding quiet and consistent across both operable screens. */
+body.collection-exhibit .topbar::after { display:none; } /* Remove decorative header lighting that competes with the sample photographs. */
+body.collection-exhibit .stage,body.collection-exhibit .concept-section,body.collection-exhibit .outcome-section { border-radius:0; box-shadow:none; border-top:2px solid #ccdcd7; background:#fff; } /* Present full teaching areas as aligned bands rather than floating cards. */
+body.collection-exhibit .stage-heading h3 { font-size:18px; line-height:1.4; } /* Keep work-area titles readable without overpowering the collected sample images. */
+body.collection-exhibit .primary-button,body.collection-exhibit .quiet-button,body.collection-exhibit .icon-button { border-radius:6px; } /* Unify command shapes while retaining familiar icon-only tools. */
+body.collection-exhibit .primary-button { background:#19785b; box-shadow:none; } /* Reserve the strongest brand contrast for actual visitor actions. */
+body.collection-exhibit .primary-button:disabled { background:#9fb9b1; color:#fff; opacity:1; } /* Keep unavailable commands legible while visibly disabled. */
+body.collection-exhibit .remote-hint { background:#e3efed; color:#235e51; box-shadow:none; } /* Give the current step a restrained status band. */
+#collectPhoto { width:100%; min-height:58px; margin:14px 0 0; font-size:18px; flex:none; } /* Make collecting a frozen sample the most visible action beside the live camera. */
+#collectionReceipt { display:flex; align-items:center; gap:12px; min-height:52px; margin:12px 0; padding:10px 0; border-top:1px solid #dce6e2; color:#285d4a; font-size:14px; overflow-wrap:anywhere; } /* Show that an actual photograph now has a human-provided name. */
+#collectionReceipt img { width:64px; height:48px; object-fit:cover; border-radius:4px; flex:none; } /* Preserve the last labeled photograph's stable aspect ratio. */
+body.collection-exhibit #labelReceipt { display:none; } /* Use the shared actual-photo receipt for both marking paths instead of showing a stale shortcut-only message. */
+#datasetQuality { font-size:13px; line-height:1.6; color:#526b61; padding:10px 0 14px; overflow-wrap:anywhere; } /* Separate raw data quantity from exact repeated-image counts. */
+#datasetQuality[data-problem=true] { color:#9b432d; border-bottom:2px solid #c76549; } /* Make proven contradictory labels visible before visitors attempt training. */
+#reviewLabels { min-height:44px; width:100%; margin:8px 0; flex:none; } /* Keep dataset audit and correction accessible on both touch and pointer screens. */
+body.collection-exhibit .thumbnails img { cursor:pointer; border:1px solid #d7e1dd; } /* Identify real sample photographs as inspectable labeling records. */
+body.collection-exhibit .thumbnails img:focus-visible,body.collection-exhibit button:focus-visible,body.collection-exhibit summary:focus-visible { outline:3px solid #317ba7; outline-offset:3px; } /* Provide visible keyboard focus without using decorative hover-only affordances. */
+body.collection-exhibit:not([data-collection-phase=ready]) .infer-stage .prediction,body.collection-exhibit:not([data-collection-phase=ready]) .infer-stage #scoreBars,body.collection-exhibit:not([data-collection-phase=ready]) .infer-stage .inference-footer,body.collection-exhibit:not([data-collection-phase=ready]) .infer-stage #challenge { display:none; } /* Show human collection before any model answer exists instead of surrounding first-time visitors with empty scores. */
+body.collection-exhibit .touch-label-section { border-top:0; margin-top:16px; padding-top:0; } /* Keep the optional direct-marking path subordinate to the main frozen-photo collection action. */
+body.collection-exhibit .touch-label-section h4 { font-size:13px; font-weight:500; color:#61736b; } /* Distinguish the shortcut from the main capture-and-label workflow. */
+#sampleLabelDialog { width:min(680px,calc(100% - 24px)); max-height:calc(100vh - 32px); overflow-y:auto; border-radius:8px; } /* Keep the complete marking interaction reachable within small browser and Android viewports. */
+.label-steps { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px; margin:14px 0 18px; font-size:13px; color:#6c7e75; } /* Name the current human-marking phase using the real collection sequence. */
+.label-steps strong { color:#187252; } /* Highlight the current labeling decision rather than an unmeasured learning result. */
+.label-steps svg { width:16px; height:16px; } /* Use familiar direction icons between stages. */
+#frozenSamplePhoto { display:block; width:100%; max-height:300px; object-fit:contain; background:#eef2f0; aspect-ratio:4/3; border-radius:4px; } /* Let visitors inspect the exact frozen image that will become a training example. */
+#currentSampleLabel { margin:16px 0; font-size:17px; font-weight:600; } /* Make the visitor's semantic-label decision explicit. */
+#sampleLabelChoices { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; } /* Reserve equal-width stable class targets for arbitrary category names. */
+#sampleLabelChoices button { min-height:64px; font-size:18px; border:1px solid #ccdcd5; border-radius:6px; white-space:normal; overflow-wrap:anywhere; } /* Support direct large-screen labeling without overflowing long class names. */
+#sampleLabelChoices button[aria-pressed=true] { border:2px solid #19785b; background:#e9f3ee; } /* Mark an existing manual label distinctly during review. */
+#sampleLabelError { min-height:24px; margin:12px 0; color:#9b432d; font-size:14px; line-height:1.5; } /* Surface persistence, concurrency and capacity errors next to the reviewed photo. */
+#deleteSamplePhoto { min-height:44px; color:#a34834; } /* Keep destructive correction explicit and visually separate from assigning a label. */
+#sampleGallery { width:min(1000px,calc(100% - 24px)); max-height:calc(100vh - 32px); overflow-y:auto; border-radius:8px; } /* Make the entire saved dataset inspectable without moving away from the exhibit. */
+#gallerySamples { display:grid; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); gap:12px; margin-top:20px; } /* Adapt the actual photograph collection to desktop and portrait dialog widths. */
+.gallery-sample { display:flex; flex-direction:column; gap:8px; padding:8px; border:1px solid #d2dfd9; border-radius:6px; background:white; min-width:0; overflow-wrap:anywhere; } /* Frame only individual repeated sample records inside the gallery tool. */
+.gallery-sample img { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:3px; } /* Keep changing photo labels and loading states from shifting the gallery grid. */
+.gallery-sample span { font-size:13px; } /* Keep human-provided class names legible below their real photographs. */
+@media (min-width:1101px) { /* Give the horizontal exhibit three work areas with a central collection surface. */
+body.collection-exhibit:not(.remote-panel) { height:auto; min-height:100vh; overflow:auto; font-size:14px; } /* Permit lower result details to scroll rather than shrinking exhibit text to fit four narrow columns. */
+body.collection-exhibit:not(.remote-panel) .topbar { height:56px; padding:0 22px; } /* Reserve a stable header for source and maintenance tools. */
+body.collection-exhibit:not(.remote-panel) main { height:auto; min-height:calc(100vh - 56px); padding:16px 22px; max-width:1920px; margin:auto; gap:16px; display:grid; grid-template-columns:minmax(230px,.85fr) minmax(360px,1.45fr) minmax(300px,1.1fr); grid-template-rows:auto auto auto auto; grid-template-areas:"session session journey" "data infer train" "concept concept outcome" "android status status"; align-items:stretch; } /* Enlarge real collection and labeling while keeping training and results visible in their own aligned bands. */
+body.collection-exhibit:not(.remote-panel) .workspace { display:contents; } /* Reuse existing controls in the new exhibit grid without duplicating their state. */
+body.collection-exhibit:not(.remote-panel) .sessionbar { grid-area:session; } body.collection-exhibit:not(.remote-panel) .journey { grid-area:journey; } body.collection-exhibit:not(.remote-panel) .data-stage { grid-area:data; } body.collection-exhibit:not(.remote-panel) .infer-stage { grid-area:infer; } body.collection-exhibit:not(.remote-panel) .train-stage { grid-area:train; } body.collection-exhibit:not(.remote-panel) .concept-section { grid-area:concept; } body.collection-exhibit:not(.remote-panel) .outcome-section { grid-area:outcome; } body.collection-exhibit:not(.remote-panel) .android-connection { grid-area:android; } body.collection-exhibit:not(.remote-panel) .statusbar { grid-area:status; } /* Assign every band explicitly even when the previous one-screen breakpoint does not apply. */
+body.collection-exhibit:not(.remote-panel) .stage { padding:18px; min-width:0; min-height:0; } /* Align all work surfaces to a consistent reading grid. */
+body.collection-exhibit:not(.remote-panel) .sessionbar { flex-wrap:wrap; gap:14px; } /* Let source controls wrap naturally instead of clipping the title. */
+body.collection-exhibit:not(.remote-panel) .lesson-title h2 { font-size:22px; white-space:normal; } /* Keep the labeling goal readable across desktop sizes. */
+body.collection-exhibit:not(.remote-panel) .journey { gap:6px; } /* Fit the four recognizable stages beside the camera toolbar. */
+body.collection-exhibit:not(.remote-panel) .journey li.current span { color:#14614c; } /* Keep the current stage readable against the light stage indicator. */
+body.collection-exhibit:not(.remote-panel) .journey li { border-radius:6px; min-width:0; padding:10px 6px; background:#fff; box-shadow:none; } /* Use stable stage indicators without gradients or decorative depth. */
+body.collection-exhibit:not(.remote-panel) .data-stage,body.collection-exhibit:not(.remote-panel) .infer-stage,body.collection-exhibit:not(.remote-panel) .train-stage { display:flex; flex-direction:column; overflow:visible; } /* Restore useful vertical space for collection instead of collapsing headings and controls. */
+body.collection-exhibit:not(.remote-panel) .infer-stage .viewfinder { width:100%; max-width:100%; height:auto; aspect-ratio:4/3; flex:none; border-radius:4px; } /* Show a large honest camera view without altering the region sent to the model. */
+body.collection-exhibit:not(.remote-panel) .camera-controls { min-height:48px; gap:6px; } /* Keep the named camera selector accessible near the preview. */
+body.collection-exhibit:not(.remote-panel) .touch-label-section h4 { display:block; margin-bottom:10px; } /* Clearly identify the retained single-tap marking shortcut. */
+body.collection-exhibit:not(.remote-panel) .touch-labels { gap:8px; } /* Keep the three shortcut labels evenly spaced beneath the capture action. */
+body.collection-exhibit:not(.remote-panel) .touch-label { min-height:44px; font-size:15px; white-space:normal; } /* Enlarge actual class targets without adding redundant command text. */
+body.collection-exhibit:not(.remote-panel) .class-record { padding:12px; margin-bottom:12px; border-radius:6px; } /* Keep class records compact while making each photograph independently inspectable. */
+body.collection-exhibit:not(.remote-panel) .thumbnails { height:72px; grid-template-rows:32px 32px; gap:4px; } /* Give recent sample photos usable keyboard and pointer targets. */
+body.collection-exhibit:not(.remote-panel) .class-name { font-size:16px; } /* Make visitor-defined category names readable before training. */
+body.collection-exhibit:not(.remote-panel) .capture-button { min-height:36px; } /* Preserve the optional hold-to-capture command for existing installations. */
+body.collection-exhibit:not(.remote-panel) .train-stage .network-wrap { height:210px; min-height:210px; flex:none; } /* Keep a clear measured network overview before the automatic enlarged training view opens. */
+body.collection-exhibit:not(.remote-panel) .learning-sample { display:flex; } /* Keep the observed photograph visible next to the genuine training record. */
+body.collection-exhibit:not(.remote-panel) .train-stage .chart-wrap { height:96px; flex:none; } /* Preserve a readable loss history without crowding collection controls. */
+body.collection-exhibit:not(.remote-panel) .concept-section { padding:20px; overflow:visible; } /* Place measured learning results in a full-width lower band. */
+body.collection-exhibit:not(.remote-panel) #sampleLearningCards { grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; } /* Compare all three human-labeled classes side by side after training. */
+body.collection-exhibit:not(.remote-panel) .sample-learning-card { grid-template-columns:64px minmax(0,1fr); padding:10px; gap:6px 10px; } /* Fit real sample comparisons without text collisions inside the result band. */
+body.collection-exhibit:not(.remote-panel) .sample-learning-card img { width:64px; height:48px; } /* Keep evidence photographs visible at stable dimensions. */
+body.collection-exhibit:not(.remote-panel) .sample-learning-card > div { grid-column:1/-1; } /* Give measured first-round and final-round answers a complete line. */
+body.collection-exhibit:not(.remote-panel) .outcome-section { padding:20px; overflow:visible; } /* Keep independent examination results in their own aligned outcome band. */
+body.collection-exhibit:not(.remote-panel) .outcome-content { grid-template-columns:minmax(0,1fr); } /* Avoid squeezing scores and arbitrary class names into the narrower outcome track. */
+body.collection-exhibit:not(.remote-panel) .training-summary,body.collection-exhibit:not(.remote-panel) .process-readout > strong { font-size:14px; } /* Keep real phase measurements legible in the training overview. */
+body.collection-exhibit:not(.remote-panel) .reference-values,body.collection-exhibit:not(.remote-panel) .metrics span { font-size:12px; } /* Increase calibration and metric label legibility in the exhibit environment. */
+} /* Finish the horizontal exhibit arrangement. */
+body.collection-exhibit.exhibit-training:not(.remote-panel) .train-stage { display:grid; overflow-y:auto; } /* Preserve automatic full-surface training above the collection-first overview. */
+body.collection-exhibit.exhibit-training:not(.remote-panel) .train-stage .network-wrap { height:100%; min-height:300px; } /* Keep the live graph dominant while real parameters are updating. */
+body.collection-exhibit.remote-panel[data-lesson-view=label] #collectPhoto { margin:4px 0; font-size:20px; min-height:60px; } /* Put frozen-photo collection within reach of the large-screen visitor. */
+body.collection-exhibit.remote-panel[data-lesson-view=label] .touch-label-section { margin-top:8px; } /* Keep the optional direct-marking buttons close to the new primary collection command. */
+body.collection-exhibit.remote-panel[data-lesson-view=result] #collectPhoto,body.collection-exhibit.remote-panel[data-lesson-view=result] #collectionReceipt { display:none; } /* Separate teaching captures from independent examination on the big screen. */
+body.collection-exhibit.remote-panel #collectionReceipt { margin:4px 0; } /* Keep label confirmation compact above the training command on portrait screens. */
+@media (max-width:1100px) { /* Reflow the local workbench before desktop grid tracks become too narrow. */
+body.collection-exhibit:not(.remote-panel) .workspace { display:flex; flex-direction:column; } /* Avoid inherited multi-column preview placement on narrow screens. */
+body.collection-exhibit:not(.remote-panel) .infer-stage { display:flex; flex-direction:column; order:-1; } /* Put the collection and labeling action before saved samples on smaller local screens. */
+body.collection-exhibit:not(.remote-panel) .infer-stage .viewfinder { width:100%; height:auto; aspect-ratio:4/3; } /* Maintain a stable camera shape without horizontal page overflow. */
+body.collection-exhibit:not(.remote-panel) .sessionbar { flex-wrap:wrap; } /* Keep source controls reachable when the heading takes two lines. */
+body.collection-exhibit:not(.remote-panel) .lesson-title h2 { font-size:22px; } /* Use fixed readable exhibit typography rather than scaling text with viewport width. */
+} /* Finish the narrow local layout. */
+@media (max-width:560px) { /* Keep the labeling tool usable within high-DPR GM92 browsers and phones. */
+#sampleLabelDialog { padding:18px; } /* Reserve room for class targets without clipping the modal border. */
+#frozenSamplePhoto { max-height:230px; } /* Keep labels and cancellation inside the available small-screen modal height. */
+#sampleLabelChoices button { min-height:60px; font-size:16px; } /* Maintain useful finger targets even for longer arbitrary class names. */
+.label-steps { font-size:11px; gap:5px; } /* Wrap the actual labeling phases cleanly above the frozen image. */
+#collectPhoto { min-height:56px; } /* Preserve the primary capture action on compact screens. */
+} /* Finish compact labeling adaptations. */

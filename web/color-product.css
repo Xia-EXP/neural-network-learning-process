@@ -1,0 +1,349 @@
+:root { --paper:#f5f4ef; --panel:#fffefa; --ink:#253246; --muted:#626c79; --line:#e4e4dd; --accent:#b84d38; --accent-hover:#a23e2d; --accent-soft:#fff0e9; --red:#ce5b4e; --yellow:#b78b23; --blue:#4778bc; --green:#2d7155; --shadow:0 5px 22px #26334405; font-family:"Microsoft YaHei UI","Microsoft YaHei","PingFang SC",system-ui,sans-serif; color:var(--ink); background:var(--paper); font-size:16px; color-scheme:light; } /* 统一暖白工作台、深蓝文字与高对比度珊瑚主操作。 */
+* { box-sizing:border-box; } /* 把内边距和边框计入尺寸以防页面横向溢出。 */
+[hidden] { display:none!important; } /* 保证脚本隐藏的相机、弹窗内容与阶段不会被其他布局规则重新显示。 */
+body { margin:0; min-width:320px; font-size:16px; line-height:1.5; } /* 为触屏与电脑保留可读的默认正文。 */
+button,input,select { font:inherit; } /* 让所有原生控件使用同一中文字体和字号。 */
+button { min-height:44px; padding:10px 16px; border:1px solid transparent; border-radius:11px; display:inline-flex; align-items:center; justify-content:center; gap:8px; color:var(--ink); background:transparent; cursor:pointer; touch-action:manipulation; transition:background .16s,border-color .16s,box-shadow .16s,transform .16s; } /* 所有操作至少提供44像素触控高度和明确的点击反馈。 */
+button:hover:not(:disabled) { background:#edf0ec; } /* 用轻微底色变化提示按钮可操作。 */
+button:active:not(:disabled) { transform:translateY(1px); } /* 让按压动作具有轻量反馈。 */
+button:disabled { cursor:not-allowed; opacity:.48; } /* 明确区分暂不可执行的操作。 */
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible { outline:3px solid #376baf; outline-offset:3px; } /* 提供足够醒目的键盘导航焦点。 */
+input,select { min-height:44px; min-width:0; max-width:100%; border:1px solid #d5d9d5; border-radius:9px; padding:9px 12px; color:var(--ink); background:#fffefa; } /* 保证输入控件不挤破窄屏并具有完整点击区。 */
+select { cursor:pointer; } /* 标识可展开的选择控件。 */
+svg { width:20px; height:20px; flex:none; stroke-width:1.8; } /* 统一离线图标的视觉重量。 */
+h1,h2,h3,p { margin:0; } /* 清除浏览器默认间距以建立可控的课堂布局。 */
+h2 { font-size:20px; font-weight:700; line-height:1.35; } /* 为区域标题提供清晰层级。 */
+h3 { font-size:17px; line-height:1.5; } /* 使子区域标题保持可读而不抢占主标题。 */
+a { color:inherit; text-decoration:none; } /* 避免品牌入口出现默认蓝色下划线。 */
+em { font-style:normal; } /* 保持中文状态文字直立显示。 */
+small { font-size:14px; } /* 即便使用语义性small元素也不缩成难读的小字。 */
+img { display:block; max-width:100%; } /* 让照片按容器缩放并消除图片基线空隙。 */
+.app-header { min-height:76px; padding:16px max(28px,calc((100vw - 1760px)/2)); border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:20px; background:#fffefaed; } /* 使用简洁的横向产品页眉并与内容宽度对齐。 */
+.brand { display:flex; align-items:center; gap:13px; min-width:0; font-size:20px; font-weight:750; letter-spacing:.02em; } /* 将产品名称和三色标识稳定排列。 */
+.brand-symbol { position:relative; display:block; width:42px; height:42px; flex:none; background:var(--ink); border-radius:13px; } /* 为三色图形提供深蓝品牌底座。 */
+.brand-symbol i { position:absolute; width:13px; height:13px; border-radius:50%; } /* 用三个圆形表达颜色学习主题。 */
+.brand-symbol i:nth-child(1) { top:10px; left:8px; background:#ef8c79; } /* 标记红色样本。 */
+.brand-symbol i:nth-child(2) { top:10px; right:8px; background:#edcc71; } /* 标记黄色样本。 */
+.brand-symbol i:nth-child(3) { bottom:8px; left:15px; background:#85ace5; } /* 标记蓝色样本。 */
+.brand-tag { font-size:14px; font-weight:500; color:var(--muted); padding-left:15px; border-left:1px solid #d5d9d6; white-space:nowrap; } /* 用可读字号区分产品与所属学习台。 */
+.header-actions { display:flex; align-items:center; gap:8px; flex:none; } /* 把低频管理操作收拢到页眉右侧。 */
+.connection-state { display:inline-flex; align-items:center; gap:8px; font-size:14px; color:var(--green); padding-right:12px; } /* 显示服务连接状态而不占用主工作区。 */
+.connection-state::before { content:""; width:7px; height:7px; border-radius:50%; background:currentColor; } /* 用实心点辅助识别当前连接状态。 */
+.connection-state.offline,.connection-state.error { color:#ad3a30; } /* 给失联状态明确的错误色。 */
+.icon-button { width:44px; min-width:44px; height:44px; padding:10px; border-color:var(--line); background:var(--panel); } /* 为图标按钮建立完整且一致的触控热区。 */
+.app-main { width:min(100%,1816px); margin:0 auto; padding:30px 28px 40px; } /* 给大屏充足展示空间并保持两侧留白。 */
+.intro { display:flex; align-items:flex-end; justify-content:space-between; gap:28px; margin:0 0 26px; } /* 让课堂主题和当前动作指引分列显示。 */
+.eyebrow { font-size:14px; font-weight:600; color:var(--muted); letter-spacing:.08em; } /* 使用可读而克制的引导标题。 */
+.intro h1 { margin-top:5px; font-size:36px; line-height:1.25; letter-spacing:-.035em; } /* 用简洁的大标题建立课堂主题。 */
+.intro h1 span { color:var(--accent); } /* 将学习动作作为唯一强调文字。 */
+.lesson-prompt { max-width:500px; color:var(--muted); font-size:16px; padding-bottom:4px; } /* 显示随流程变化的一条操作指导。 */
+.steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:22px; } /* 将三步学习顺序完整呈现在主区域上方。 */
+.step { min-height:68px; padding:14px 20px; border:1px solid var(--line); border-radius:14px; justify-content:flex-start; gap:13px; background:#eeeee7; } /* 给每一步设置清晰、宽大的导航入口。 */
+.step b { font-family:Consolas,"SFMono-Regular",monospace; font-size:22px; font-weight:400; color:#717b86; } /* 让步骤编号易于远距离辨认。 */
+.step>span { font-weight:700; font-size:17px; } /* 强调步骤动作而非次要状态。 */
+.step em { margin-left:auto; font-size:14px; color:var(--muted); white-space:nowrap; } /* 把实时进度置于导航尾部。 */
+.step.active,.step[aria-current="step"] { background:var(--panel); border-color:#b7bfb9; box-shadow:0 3px 0 #253246; } /* 明确标出当前教学阶段。 */
+.step.active b,.step[aria-current="step"] b { color:var(--accent); } /* 用强调色指示当前步骤编号。 */
+.step.complete b { color:var(--green); } /* 区分已经完成的步骤。 */
+.workspace { display:grid; grid-template-columns:minmax(300px,340px) minmax(0,1fr); align-items:start; gap:22px; } /* 把训练舞台设置为比采集列更大的主要视觉区域。 */
+.workspace>* { min-width:0; } /* 防止图表、照片或长文字扩大网格列宽。 */
+.capture-column { display:grid; gap:18px; } /* 将相机与样本分成两个紧凑而清晰的区域。 */
+.panel { border:1px solid var(--line); border-radius:18px; background:var(--panel); box-shadow:var(--shadow); overflow:hidden; } /* 建立轻量的白色工作面板。 */
+.panel-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:18px 18px 15px; } /* 统一采集卡标题与状态布局。 */
+.panel-heading h2 { display:flex; align-items:center; gap:9px; font-size:18px; min-width:0; } /* 保持左栏标题紧凑且可读。 */
+.status-pill,.count-tag { display:inline-flex; align-items:center; justify-content:center; gap:6px; border:1px solid #e2e5de; border-radius:8px; background:#f2f3ee; padding:5px 9px; font-size:14px; line-height:1.4; font-weight:500; color:var(--muted); } /* 为真实阶段和计数提供稳定的状态容器。 */
+.status-pill.running,.status-pill.active { color:#996022; background:#fff2df; border-color:#f1ddbd; } /* 使用暖色标记正在执行的学习阶段。 */
+.status-pill.ready,.status-pill.success { color:var(--green); background:#eaf4ed; border-color:#c9e0ce; } /* 用绿色标记已经完成且可继续的状态。 */
+.viewfinder { position:relative; margin:0 13px; width:calc(100% - 26px); aspect-ratio:4/3; overflow:hidden; border-radius:12px; background:#e6eae4; isolation:isolate; } /* 保持与实际相机裁切一致的四比三画面。 */
+#cameraCanvas { display:block; width:100%; height:100%; object-fit:contain; } /* 让实时画面完整覆盖取景区域且不发生额外裁切。 */
+.scan-frame { position:absolute; inset:20%; border:2px solid #fff8; border-radius:9px; box-shadow:0 0 0 120px #17273138; pointer-events:none; } /* 将取景区域突出，并与保存时的中央60%裁切严格对应。 */
+.viewfinder.remote .scan-frame { display:none; } /* 远端收到的画面已经裁切，避免再次画出误导性的内框。 */
+.scan-frame::before,.scan-frame::after { content:""; position:absolute; width:24px; height:24px; border-color:#fff; border-style:solid; } /* 加强扫描框对角定位点。 */
+.scan-frame::before { left:-3px; top:-3px; border-width:3px 0 0 3px; border-radius:8px 0 0 0; } /* 强调扫描框左上角。 */
+.scan-frame::after { right:-3px; bottom:-3px; border-width:0 3px 3px 0; border-radius:0 0 8px 0; } /* 强调扫描框右下角。 */
+.scan-frame span { position:absolute; left:50%; bottom:-28px; transform:translateX(-50%); padding:2px 6px; border-radius:4px; background:#182c3bd9; color:#fff; font-size:14px; white-space:nowrap; } /* 在取景框附近提供唯一必要的摆放提示。 */
+.camera-empty { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:radial-gradient(circle at 50% 15%,#f4f5ef,#e6eae3); padding:10px; } /* 相机未连接时展示明确的可执行起点。 */
+.camera-glyph { width:42px; height:42px; display:grid; place-items:center; color:#657369; } /* 用相机图形说明输入来源。 */
+.camera-glyph svg { width:32px; height:32px; stroke-width:1.4; } /* 让空态相机图标保持轻盈。 */
+.camera-empty h3 { margin-bottom:4px; font-size:18px; font-weight:600; } /* 给相机空态一个清晰的行动标题。 */
+.primary-button { color:#fff; background:var(--accent); border-color:var(--accent); font-size:16px; font-weight:650; min-height:46px; box-shadow:0 2px 2px #6e27100a; } /* 用高对比度珊瑚色突出当前主要动作。 */
+.primary-button:hover:not(:disabled) { color:#fff; background:var(--accent-hover); border-color:var(--accent-hover); } /* 保持主按钮悬停时的文字对比度。 */
+.primary-button:disabled { background:#d5d5cc; color:#626b70; border-color:#d5d5cc; opacity:1; box-shadow:none; } /* 在禁用状态保持文字可读并明确不可点击。 */
+.secondary-button { background:#fffefa; border-color:#ced5d0; font-size:16px; font-weight:550; min-height:46px; } /* 用轮廓按钮承载暂停、回看和管理等辅助动作。 */
+.text-button { color:#4e6272; font-size:14px; min-height:44px; padding:8px 10px; border-radius:8px; text-decoration:underline; text-underline-offset:4px; text-decoration-color:#a8b2b8; } /* 保持次要入口可识别且具有完整热区。 */
+.danger-button { color:#a3382d; background:#fff1ec; border-color:#edc8bd; font-size:16px; } /* 用温和但明确的危险色区分清空和删除操作。 */
+.capture-flash { position:absolute; inset:0; z-index:5; background:#fff9; pointer-events:none; } /* 在照片真正保存后显示短促快门反馈。 */
+.camera-toolbar { display:flex; align-items:center; gap:8px; padding:12px 13px 14px; } /* 将相机选择与重连放到取景框下方。 */
+.camera-toolbar select { flex:1; width:0; font-size:14px; text-overflow:ellipsis; padding-left:10px; } /* 在有限宽度内保留完整设备选择能力。 */
+.camera-toolbar .icon-button { border-color:#d5d9d5; } /* 保持设备操作与下拉框边界一致。 */
+.demo-controls { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:0 13px 14px; } /* 让演示操作在左侧窄列中自然换行。 */
+.demo-colors { display:flex; gap:3px; } /* 紧凑呈现三种演示物体颜色。 */
+.swatch { width:44px; min-width:44px; height:44px; padding:9px; position:relative; } /* 给颜色圆点保留四十四像素点击区。 */
+.swatch::before { content:""; width:24px; height:24px; border-radius:50%; border:1px solid #0002; background:var(--class-color,var(--red)); } /* 只以内部圆点表达颜色，避免过大高饱和色块。 */
+.swatch.red { --class-color:#db6a58; } /* 定义演示红色。 */
+.swatch.yellow { --class-color:#e6bd51; } /* 定义演示黄色。 */
+.swatch.blue { --class-color:#729bd5; } /* 定义演示蓝色。 */
+.swatch.selected,.swatch[aria-pressed="true"] { border-color:#7d8987; background:#fff; } /* 明确当前演示颜色。 */
+.demo-controls .secondary-button { padding:8px 10px; font-size:14px; } /* 给窄列中的换物体按钮保留空间。 */
+.inline-error { margin:0 14px 14px; padding:10px 12px; font-size:14px; color:#9d382d; background:#fff0e9; border-radius:8px; overflow-wrap:anywhere; } /* 仅在失败时显示可读的恢复提示。 */
+.samples-card { padding-bottom:14px; } /* 为采集动作与操作提示留出底部空间。 */
+.class-cards { display:grid; gap:9px; padding:0 13px 14px; } /* 将三个颜色类别分成易于识别的独立条目。 */
+.class-card { min-width:0; border:1px solid #e2e5de; border-left:4px solid var(--class-color,#d06051); border-radius:10px; background:#fafaf5; overflow:hidden; } /* 用类别色侧边条组织真实照片。 */
+.class-card:nth-child(2) { --class-color:#bd962e; } /* 在没有行内配色时为第二类提供黄色标记。 */
+.class-card:nth-child(3) { --class-color:#5681bb; } /* 在没有行内配色时为第三类提供蓝色标记。 */
+.class-card.selected,.class-card[aria-pressed="true"],.class-card.active { background:#fff5ef; border-top-color:#d9a18e; border-right-color:#d9a18e; border-bottom-color:#d9a18e; } /* 清楚标明下一张照片将归属的类别。 */
+.class-select,.class-title { width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:44px; padding:8px 10px; border-radius:0; font-size:15px; font-weight:650; text-align:left; } /* 把整个类别标题变成方便触摸的标签选择入口。 */
+.class-select>span:first-child,.class-title>span:first-child { display:flex; align-items:center; gap:7px; min-width:0; overflow-wrap:anywhere; } /* 保持色点与可能较长的类别名称一起对齐。 */
+.class-select .class-title { width:auto; min-height:0; padding:0; justify-content:flex-start; } /* 兼容动态按钮内的类别标题，不增加第二层点击高度。 */
+.class-count { font-family:Consolas,monospace; font-size:14px; font-weight:500; color:var(--muted); white-space:nowrap; } /* 用清晰数字展示保存的照片张数。 */
+.color-dot { display:inline-block; width:9px; height:9px; flex:none; border-radius:50%; background:var(--class-color,#cb6053); } /* 以非文字颜色标记辅助识别类别。 */
+.class-thumbs { display:flex; gap:5px; align-items:center; padding:0 9px 9px; overflow:hidden; min-height:48px; } /* 保持照片列表紧凑并避免撑宽左栏。 */
+.sample-thumb { padding:0; width:44px; min-width:44px; height:44px; flex:none; border:1px solid #d4d9d1; border-radius:6px; overflow:hidden; background:#eee; } /* 为真实缩略图提供可点开的完整触控区。 */
+.sample-thumb img { width:100%; height:100%; object-fit:cover; } /* 以一致的缩略图尺寸展示已保存的照片。 */
+.empty-thumbs,.sample-placeholder,.empty-samples { color:var(--muted); font-size:14px; padding:8px 0; } /* 用可读字号呈现尚未采集的类别。 */
+.capture-button { display:flex; width:calc(100% - 26px); margin:0 13px; min-height:48px; } /* 让拍照动作在左侧工作区始终明确。 */
+.photo-actions { padding:0 14px 16px; } /* 将颜色选择与快门固定在相机画面下方的正常文档流中。 */
+.photo-actions .exam-labels { margin:0 0 10px; gap:6px; } /* 用紧凑三色选择器明确下一张照片的标签。 */
+.photo-actions .capture-button { width:100%; margin:0; } /* 让相机下方快门占满可用宽度以方便触摸。 */
+.photo-actions .action-hint { margin:10px 2px 0; } /* 将必要采集要求紧接快门而不增加多余留白。 */
+.action-hint { color:var(--muted); font-size:14px; margin:12px 16px 0; } /* 保留开始学习所需的最短采集要求。 */
+.training-stage,.results-stage { padding:25px 28px 18px; } /* 给核心学习舞台充足呼吸空间。 */
+.training-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin-bottom:22px; } /* 用大标题与实际状态标识构成学习主舞台顶部。 */
+.training-heading .eyebrow { margin-bottom:6px; } /* 区分引导语与主要训练标题。 */
+.training-heading h2 { font-size:27px; letter-spacing:-.02em; line-height:1.35; } /* 让训练标题成为工作台的视觉焦点。 */
+.training-heading>.status-pill { flex:none; margin-top:5px; } /* 避免状态被标题挤压。 */
+.training-phases { display:flex; align-items:center; justify-content:space-between; gap:8px; border:1px solid #e4e6df; border-radius:11px; padding:8px 12px; margin-bottom:12px; background:#f6f7f2; } /* 在训练舞台内展示真实处理阶段并紧接可操作的训练控制。 */
+.phase { display:inline-flex; align-items:center; gap:7px; min-height:32px; font-size:14px; color:#697381; white-space:nowrap; } /* 让阶段名称保持可读且整齐。 */
+.phase svg { width:18px; height:18px; } /* 缩减阶段图标占用而不缩小文字。 */
+.phase.active { color:var(--accent); font-weight:700; } /* 突出当前正在执行的阶段。 */
+.phase.done,.phase.complete { color:var(--green); } /* 区分已经完成的真实阶段。 */
+.training-phases>svg { width:16px; height:16px; color:#a5ada6; } /* 用轻量箭头连接三个处理阶段。 */
+.network-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:9px; min-height:44px; } /* 将正在观察的训练轮次与颜色选择并列显示。 */
+#roundLabel { font-size:15px; font-weight:650; } /* 清楚区分实时训练与回放轮次。 */
+.probe-tabs { display:flex; gap:4px; background:#f1f3ed; border:1px solid #e4e7df; border-radius:10px; padding:3px; } /* 将观察样本切换做成紧凑的分段按钮。 */
+.probe-tabs button { min-height:44px; min-width:48px; padding:7px 12px; font-size:14px; color:#596474; border-radius:7px; } /* 为三种样本保留清晰名称与至少44像素触控热区。 */
+.probe-tabs button[aria-pressed="true"],.probe-tabs button.active,.probe-tabs button.selected { background:#fff; box-shadow:0 1px 4px #283b3712; color:var(--ink); font-weight:650; border-color:#dce0d9; } /* 标出当前网络图对应的真实照片类别。 */
+.network-stage { display:grid; grid-template-columns:136px minmax(0,1fr); gap:12px; min-height:264px; border:1px solid #263a51; border-radius:13px; padding:16px; background:radial-gradient(ellipse at 55% 48%,#334a6150,#1d2a3b00),#202e40; } /* 用深海军蓝舞台突出真实照片、神经网络和亮色输出读数。 */
+.probe-photo { display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:9px; min-width:0; padding:8px 8px 8px 0; } /* 把训练照片放到神经网络输入端。 */
+.probe-photo>span { font-size:14px; color:#c0cad6; } /* 在深色舞台上清楚标识当前被网络观察的照片。 */
+.probe-image-wrap { display:grid; place-items:center; width:120px; max-width:100%; aspect-ratio:4/3; border:1px solid #667789; border-radius:10px; overflow:hidden; background:#2f4054; } /* 为真实代表照片或空态图标保留固定位置。 */
+.probe-image-wrap img { width:100%; height:100%; object-fit:cover; } /* 按实际照片比例填满观察窗口。 */
+.probe-image-wrap>svg { width:30px; height:30px; color:#becbd9; } /* 提供尚无训练照片时的高对比度简洁占位。 */
+.probe-photo strong { font-size:16px; font-weight:650; color:#eef3f8; overflow-wrap:anywhere; } /* 保证真实标签在深色舞台上清楚可读且不会遮挡网络图。 */
+.network-graph { min-width:0; display:flex; flex-direction:column; justify-content:center; } /* 给画布明确的弹性区域并保留图下注释。 */
+#networkCanvas { display:block; width:100%; height:218px; flex:none; } /* 为真实网络图设定稳定高度以避免画布伸缩循环。 */
+.network-captions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); align-items:center; gap:4px; padding:0 12px; font-size:14px; color:#c0cad6; } /* 用三个高对比度简短标签解释网络从输入到输出的方向。 */
+.network-captions span:nth-child(2) { text-align:center; } /* 将神经元标签置于中间层下方。 */
+.network-captions span:last-child { text-align:right; } /* 为输出得分保留右侧阅读空间。 */
+.training-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; padding:20px 0; margin:0 0 3px; border-bottom:1px solid var(--line); } /* 让答对数量、误差与轮次同时可见。 */
+.training-metrics>div { display:flex; flex-direction:column; gap:4px; padding-left:19px; border-left:1px solid #e1e4db; min-width:0; } /* 通过细线分组指标而不增加多余卡片。 */
+.training-metrics>div:first-child { padding-left:0; border-left:0; } /* 让首项指标与图表左边对齐。 */
+.training-metrics span,.exam-summary span { font-size:14px; color:var(--muted); } /* 保持指标名称清楚可读。 */
+.training-metrics strong { font-family:Consolas,"SFMono-Regular",monospace; font-size:32px; line-height:1.3; font-weight:600; color:var(--ink); } /* 用大号等宽数字突出真实训练变化。 */
+.training-metrics strong small { font-size:17px; color:#717c86; font-weight:400; } /* 让总数附在大数字后保持足够可读。 */
+.training-metrics em { color:#687463; font-size:14px; overflow-wrap:anywhere; } /* 以可读文字呈现首轮对照或参数变化。 */
+.chart-block { padding-top:17px; } /* 在指标下方展开完整的损失变化。 */
+.chart-heading,.history-heading { display:flex; align-items:center; justify-content:space-between; gap:15px; } /* 对齐图表标题和简短状态。 */
+.chart-heading h3,.history-heading h3 { font-size:16px; font-weight:650; } /* 保持图表与记录区域的阅读层级。 */
+.chart-heading>span { font-size:14px; color:var(--muted); } /* 显示真实曲线的轮次或变化摘要。 */
+.chart-wrap { position:relative; width:100%; height:150px; margin-top:10px; } /* 为损失曲线提供明确的大画布。 */
+#lossCanvas { display:block; width:100%; height:150px; } /* 让绘图缓冲区可以按实际显示尺寸建立。 */
+.chart-empty { position:absolute; inset:0; display:grid; place-items:center; color:#768172; font-size:15px; background:linear-gradient(#f5f6ef80,#f5f6ef00); pointer-events:none; } /* 在没有实际训练记录时给出简短空态。 */
+.timeline { display:flex; align-items:center; gap:12px; min-height:50px; padding-top:3px; margin-bottom:14px; } /* 将历史回看控制紧贴训练曲线。 */
+.timeline .icon-button { background:#f4f6ef; border-color:#e0e4da; } /* 区分回看工具与主动作。 */
+#roundSlider { flex:1; min-width:0; width:0; height:44px; padding:0; border:0; accent-color:var(--accent); background:transparent; cursor:pointer; } /* 允许拖动真实训练历史且保持触屏热区。 */
+#timelineLabel { font-size:14px; font-family:Consolas,monospace; color:var(--muted); min-width:55px; text-align:right; white-space:nowrap; } /* 让轮次读数在拖动时保持固定位置。 */
+.timeline>.text-button { white-space:nowrap; } /* 防止返回实时按钮被压成多行。 */
+.training-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:9px; padding:0 0 14px; margin-bottom:10px; border-bottom:1px solid var(--line); } /* 将开始、暂停和单步紧贴处理阶段，随后自然进入网络观察区。 */
+.pace-control { display:flex; align-items:center; gap:9px; font-size:14px; color:var(--muted); margin-right:auto; } /* 让访客直接选择适合讲解的训练节奏。 */
+.pace-control select { font-size:14px; min-height:46px; padding:9px 10px; min-width:92px; } /* 为节奏下拉框保留清晰触控空间。 */
+.training-actions>.primary-button { min-width:150px; } /* 确保开始学习和检验入口具有明确视觉优先级。 */
+.training-notice { margin-top:13px; min-height:23px; font-size:14px; color:var(--muted); } /* 仅保留与下一步操作直接有关的状态提示。 */
+.exam-capture { padding-bottom:15px; } /* 给新照片检验操作留出底部间距。 */
+.exam-capture>p { font-size:15px; margin:0 18px 14px; color:var(--muted); } /* 提醒访客先选真实颜色再揭晓模型答案。 */
+.exam-labels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin:12px 0; } /* 并排呈现三个独立的预期答案按钮。 */
+.exam-capture .exam-labels { margin:12px 14px; } /* 保持检验标签与左栏卡片边距一致。 */
+.exam-labels button { border-color:#d7ddd4; background:#fffefa; padding:9px 6px; min-height:46px; font-size:15px; overflow-wrap:anywhere; } /* 在窄屏中保证每个颜色选择按钮完整可读。 */
+.exam-labels button.selected,.exam-labels button.active,.exam-labels button[aria-pressed="true"] { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); box-shadow:inset 0 0 0 1px var(--accent); } /* 在揭晓答案前清楚显示访客选定的真实颜色。 */
+.exam-capture>.primary-button { display:flex; width:calc(100% - 28px); margin:14px 14px 4px; min-height:48px; } /* 突出新样品拍照检验的主动作。 */
+.exam-capture>.text-button { display:flex; margin:0 auto; } /* 将返回采集作为次要入口。 */
+.results-stage { min-height:780px; } /* 给独立检验结果足够展示空间。 */
+.exam-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; min-height:325px; padding:24px; gap:13px; background:radial-gradient(ellipse at center,#f1f4e9 0%,#fffefa 65%); } /* 在真实结果出现前保留干净而明确的等待状态。 */
+.exam-orbit { display:grid; place-items:center; width:96px; height:96px; margin-bottom:10px; border:1px solid #d9dfd4; border-radius:50%; background:#fffdf8; box-shadow:0 0 0 12px #eff2e999,0 0 0 24px #f6f7f1aa; color:#62735e; } /* 用扫描图标表达新样品检验任务。 */
+.exam-orbit svg { width:38px; height:38px; stroke-width:1.3; } /* 保持结果空态的扫描图标清楚可辨。 */
+.exam-empty h3 { font-size:23px; } /* 为检验空态给出直接的行动标题。 */
+.exam-empty p { color:var(--muted); font-size:16px; } /* 使用正常正文说明下一步拍摄动作。 */
+.exam-result { display:grid; grid-template-columns:minmax(160px,42%) minmax(0,1fr); gap:25px; padding:24px 0 28px; align-items:center; } /* 将被检验的新照片与实际答案并列。 */
+.exam-result>img { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:14px; border:1px solid #dce1d7; background:#eef0e8; } /* 保留可回看的原始检验画面。 */
+.exam-answer { min-width:0; } /* 防止长类别名称扩大结果列。 */
+.exam-answer>span { font-size:15px; color:var(--muted); } /* 标明访客在检验前声明的真实颜色。 */
+.exam-answer h3 { font-size:32px; color:var(--green); margin:6px 0; letter-spacing:-.025em; } /* 让实际答对结果成为结果页焦点。 */
+.exam-answer.wrong h3,.exam-result.wrong h3,#examVerdict.wrong,#examVerdict.incorrect { color:#aa4432; } /* 错误结果使用清楚的不同颜色而不伪装成成功。 */
+.exam-answer>p { font-size:17px; margin-bottom:18px; overflow-wrap:anywhere; } /* 明确呈现模型真正给出的颜色答案。 */
+.exam-scores { display:grid; gap:10px; margin:15px 0; } /* 展示三种颜色各自的模型得分。 */
+.score-row { display:grid; grid-template-columns:minmax(44px,auto) minmax(0,1fr) 58px; align-items:center; gap:8px; font-size:14px; } /* 让颜色标签、得分条和数值沿同一行对齐并容纳100.0%。 */
+.score-row>span:first-child { max-width:120px; overflow-wrap:anywhere; } /* 长类别名称可以换行而不遮挡得分条。 */
+.score-row>span:last-child,.score-row>strong:last-child,.score-row>b:last-child { text-align:right; font-variant-numeric:tabular-nums; font-weight:500; } /* 稳定展示每个实际输出得分。 */
+.score-track { overflow:hidden; height:8px; border-radius:8px; background:#edf0e7; } /* 为真实概率得分提供中性底轨。 */
+.score-fill { display:block; height:100%; border-radius:8px; background:var(--class-color,var(--accent)); transition:width .2s; } /* 以对应类别色呈现当前得分宽度。 */
+.exam-summary { display:grid; grid-template-columns:1fr 1fr 1.2fr; gap:16px; padding:22px 0; margin-top:10px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); } /* 用独立统计展示本轮新照片的答对与覆盖情况。 */
+.exam-summary>div { display:flex; flex-direction:column; gap:7px; padding-left:18px; border-left:1px solid var(--line); min-width:0; } /* 将三个检验指标视觉分组。 */
+.exam-summary>div:first-child { padding-left:0; border:0; } /* 与结果照片保持左对齐。 */
+.exam-summary strong { font-size:26px; font-weight:650; line-height:1.35; overflow-wrap:anywhere; } /* 让成功条件与数量在大屏上易于辨认。 */
+#examOutcome { font-size:22px; color:var(--green); } /* 强调按实际独立检验计算的本轮结果。 */
+.history-heading { margin:24px 0 12px; } /* 将每张检验记录与上方总结分开。 */
+.exam-history { display:grid; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); gap:10px; min-height:70px; max-height:400px; overflow-y:auto; } /* 展示全部独立检验照片并约束长历史区。 */
+.exam-history-card { border:1px solid #dce3d7; background:#f6f8f0; border-radius:10px; overflow:hidden; min-width:0; padding:7px; display:flex; flex-direction:column; gap:5px; } /* 为每次检验保留照片、标签和真实结果。 */
+.exam-history-card img { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:5px; } /* 保持历史照片尺寸一致。 */
+.exam-history-card strong { font-size:14px; color:var(--green); overflow-wrap:anywhere; } /* 用可读文字标记每张照片的答对状态。 */
+.exam-history-card span { font-size:14px; color:var(--muted); overflow-wrap:anywhere; } /* 保留实际标签或预测名称。 */
+.exam-history-card>div { display:flex; flex-direction:column; gap:2px; } /* 将检验照片的真实标签与模型回答分行展示。 */
+.exam-history-card .result-mark { align-self:flex-end; color:var(--green); font-weight:700; font-size:16px; } /* 用醒目的结果符号辅助快速浏览独立记录。 */
+.exam-history-card.wrong,.exam-history-card.incorrect { border-color:#edc6b9; background:#fff2ec; } /* 让错误记录在历史中仍清楚可见。 */
+.exam-history-card.wrong strong,.exam-history-card.incorrect strong,.exam-history-card.incorrect .result-mark { color:#a44330; } /* 以错误色标明未通过的检验。 */
+.status-pill.is-live { color:var(--green); background:#eaf4ed; border-color:#c9e0ce; } /* 清楚标记当前接通的相机画面。 */
+.results-actions { display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-end; padding-top:24px; } /* 将改进样本和复盘训练的入口保留在结果末尾。 */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); max-width:min(90vw,620px); z-index:100; background:#253246; color:#fff; padding:13px 22px; border-radius:12px; box-shadow:0 8px 30px #24324624; font-size:16px; text-align:center; pointer-events:none; } /* 用可读的短暂通知反馈保存或操作结果。 */
+dialog { width:min(540px,calc(100vw - 32px)); max-height:calc(100dvh - 40px); padding:0; border:1px solid #d9dfd4; border-radius:20px; background:var(--panel); color:var(--ink); box-shadow:0 22px 90px #182a3440; overflow-y:auto; } /* 让课堂管理与确认对话框在所有屏幕内完整可用。 */
+dialog::backdrop { background:#1c2b3c66; backdrop-filter:blur(4px); } /* 在对话框出现时突出当前必须处理的操作。 */
+.dialog-header { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:18px 22px; border-bottom:1px solid var(--line); } /* 固定对话框标题和显式关闭入口。 */
+.dialog-header h2 { font-size:22px; } /* 让管理对话框标题清楚可读。 */
+.dialog-body { padding:22px; } /* 为对话框内容提供统一间距。 */
+.dialog-body>h2 { margin-bottom:14px; } /* 将确认标题与具体动作说明分开。 */
+.dialog-body>p { color:var(--muted); font-size:16px; margin:8px 0 18px; overflow-wrap:anywhere; } /* 让替换数据的后果以正常正文呈现。 */
+.dialog-body>label { display:block; font-size:16px; font-weight:600; margin-bottom:10px; } /* 明确颜色名称编辑区域。 */
+.name-fields { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin-bottom:14px; } /* 并排编辑三个类别且不允许输入框撑破对话框。 */
+.name-fields input { width:100%; min-height:46px; } /* 提供可触摸的类别编辑框。 */
+.name-fields label { min-width:0; } /* 兼容带标签的动态类别输入结构。 */
+.project-buttons { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:24px; padding-top:20px; border-top:1px solid var(--line); } /* 将导入导出与新课堂管理组织成清晰动作组。 */
+.project-buttons .danger-button { grid-column:1/-1; } /* 把清空动作单独成行以降低误触。 */
+.dialog-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; } /* 将确认与取消统一放在操作说明之后。 */
+.review-image { width:100%; aspect-ratio:4/3; object-fit:contain; background:#ecefe5; border:1px solid #dce1d6; border-radius:12px; margin-bottom:18px; } /* 让用户在改标签前清楚检查选中照片。 */
+.share-address { overflow-wrap:anywhere; padding:12px; border:1px solid #dde3d6; border-radius:9px; background:#f2f5ea; user-select:all; } /* 允许触屏连接地址完整换行并方便复制。 */
+.gallery-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:10px; max-height:60dvh; overflow-y:auto; padding:4px; } /* 让全部样本在可滚动照片墙中逐张审查。 */
+.gallery-card { min-width:44px; min-height:44px; padding:6px; border:1px solid #d7ded2; border-radius:9px; background:#f6f8f0; display:flex; flex-direction:column; align-items:stretch; gap:5px; font-size:14px; } /* 保证每张完整样本都可点开且名称清楚可读。 */
+.gallery-card img { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:5px; } /* 在样本照片墙中维持一致的真实图像比例。 */
+@media (min-width:1600px) { /* 大屏上进一步扩大真实训练图与指标的展示空间。 */
+  .workspace { grid-template-columns:360px minmax(0,1fr); gap:26px; } /* 把大屏左侧采集列限制在360像素以继续突出训练。 */
+  .training-stage,.results-stage { padding:28px 34px 22px; } /* 为更大的主舞台增加舒适间距。 */
+  .network-stage { grid-template-columns:164px minmax(0,1fr); min-height:288px; } /* 为真实照片与网络连线提供更宽的观察区域。 */
+  .probe-image-wrap { width:146px; } /* 随屏幕扩大训练照片而非扩大无用装饰。 */
+  #networkCanvas { height:242px; } /* 提高大屏网络图的实际展示高度。 */
+  .chart-wrap,#lossCanvas { height:165px; } /* 在大屏上增大误差曲线以便远距离观察。 */
+} /* 结束大屏增强。 */
+@media (max-width:1190px) { /* 在较窄的笔记本窗口中减少装饰间距而不压缩正文字号。 */
+  .app-main { padding:24px 20px 32px; } /* 回收边缘留白给实际内容。 */
+  .workspace { grid-template-columns:300px minmax(0,1fr); gap:16px; } /* 保持完整左栏并优先给训练图分配剩余宽度。 */
+  .training-stage,.results-stage { padding:22px 20px 18px; } /* 减小主舞台边距以维持网络图宽度。 */
+  .training-heading h2 { font-size:24px; } /* 让标题在有限横向空间内自然换行。 */
+  .training-heading { gap:10px; } /* 避免标题和状态标签发生挤压。 */
+  .training-heading>.status-pill { max-width:110px; } /* 让较长状态在自己的区域内换行。 */
+  .network-stage { grid-template-columns:100px minmax(0,1fr); gap:4px; padding:12px; } /* 为输出得分保留更多横向位置。 */
+  .probe-image-wrap { width:92px; } /* 缩减训练照片边长而不影响内容可辨认性。 */
+  .probe-tabs button { padding:7px 8px; } /* 缩小颜色切换按钮左右留白以容纳完整名称。 */
+  .training-metrics { gap:12px; } /* 在窄舞台中减少三项指标之间的空隙。 */
+  .training-metrics>div { padding-left:12px; } /* 控制指标分隔线后的横向空白。 */
+  .step { padding:12px 14px; gap:10px; } /* 让步骤导航仍能完整显示名称。 */
+  .step em { display:none; } /* 仅在空间不足时隐藏重复进度，保留主要步骤名称。 */
+  .exam-result { grid-template-columns:1fr; gap:18px; } /* 新照片与答案在中等宽度下上下排列以防遮挡。 */
+  .exam-result>img { max-width:320px; } /* 避免单列结果照片占满整屏高度。 */
+} /* 结束笔记本宽度适配。 */
+@media (max-width:950px) { /* 在平板与竖屏上改用完整单列工作流。 */
+  .workspace { grid-template-columns:minmax(0,1fr); gap:20px; } /* 取消过窄的并排布局，保持内容完整。 */
+  .capture-column { grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:start; gap:16px; } /* 在宽平板上把相机和样本并排放在训练舞台之前。 */
+  .workspace[data-view="train"] .training-stage { order:-1; } /* 进入训练阶段后先看到完整训练过程。 */
+  .workspace[data-view="test"] .capture-column { grid-template-columns:minmax(0,1fr) minmax(0,1fr); } /* 让新样品采集与类别选择在平板上并列。 */
+  .intro { align-items:center; gap:20px; } /* 将主题和当前指引在较窄页面内自然布局。 */
+  .lesson-prompt { max-width:42%; } /* 避免操作指引占据全部横向空间。 */
+  .network-stage { grid-template-columns:130px minmax(0,1fr); gap:12px; } /* 单列模式恢复真实训练照片的可见尺寸。 */
+  .probe-image-wrap { width:120px; } /* 让训练图片在平板上方便观察。 */
+  #networkCanvas { height:240px; } /* 保留完整的神经网络纵向空间。 */
+  .training-heading h2 { font-size:27px; } /* 单列舞台中恢复突出的大标题。 */
+  .exam-result { grid-template-columns:minmax(160px,40%) minmax(0,1fr); } /* 在完整平板宽度中恢复照片与答案并排。 */
+  .results-stage { min-height:unset; } /* 允许结果页按实际记录自然延伸。 */
+} /* 结束平板单列适配。 */
+@media (max-width:620px) { /* 为手机和540像素立式触屏提供完整可触摸界面。 */
+  .app-header { min-height:66px; padding:12px 15px; gap:10px; } /* 缩减窄屏页眉留白但保留操作热区。 */
+  .brand { gap:9px; font-size:17px; letter-spacing:0; } /* 让产品名称在手机上完整显示。 */
+  .brand-symbol { width:38px; height:38px; border-radius:11px; } /* 缩减标识尺寸为名称保留空间。 */
+  .brand-symbol i:nth-child(1) { left:6px; top:8px; } /* 在紧凑标识内重排红色圆点。 */
+  .brand-symbol i:nth-child(2) { right:6px; top:8px; } /* 在紧凑标识内重排黄色圆点。 */
+  .brand-symbol i:nth-child(3) { left:13px; bottom:6px; } /* 在紧凑标识内重排蓝色圆点。 */
+  .brand-tag,.connection-state { display:none; } /* 在手机页眉中让出重复身份和状态所占空间。 */
+  .header-actions { gap:5px; } /* 保持管理与全屏按钮不换行。 */
+  .app-main { padding:22px 14px 28px; } /* 给窄屏内容保留适度边缘留白。 */
+  .intro { display:block; margin-bottom:20px; } /* 将主题与操作提示上下排列。 */
+  .intro h1 { font-size:31px; } /* 保持主标题突出并避免手机端拥挤。 */
+  .lesson-prompt { max-width:none; margin-top:12px; font-size:15px; } /* 确保下一步指引有完整可读宽度。 */
+  .steps { gap:7px; margin-bottom:16px; } /* 三个步骤仍保持同屏可达。 */
+  .step { padding:10px 5px; min-height:78px; gap:3px; flex-direction:column; border-radius:11px; } /* 在手机上用编号在上、动作在下的清晰导航。 */
+  .step b { font-size:20px; } /* 保留易辨认的步骤编号。 */
+  .step>span { font-size:14px; white-space:nowrap; } /* 保证三个动作名称完整且不缩到小字号。 */
+  .capture-column,.workspace[data-view="test"] .capture-column { grid-template-columns:minmax(0,1fr); gap:15px; } /* 窄屏相机与样本按完整宽度上下排列。 */
+  .camera-card { max-width:none; } /* 允许立式触屏充分利用摄像头宽度。 */
+  .viewfinder { margin:0 14px; width:calc(100% - 28px); } /* 保持手机取景区与控件边缘对齐。 */
+  .camera-empty { gap:8px; } /* 在手机完整宽度相机空态中恢复舒适间距。 */
+  .class-thumbs { gap:7px; } /* 利用完整手机列宽展示真实缩略图。 */
+  .panel-heading { padding:17px 16px 14px; } /* 统一窄屏卡片标题间距。 */
+  .training-stage,.results-stage { padding:20px 15px 16px; border-radius:15px; } /* 为手机中的主学习区域控制留白。 */
+  .training-heading { flex-wrap:wrap; gap:10px; margin-bottom:16px; } /* 让较长标题和状态在窄屏中自然换行。 */
+  .training-heading h2 { font-size:23px; } /* 保留主舞台标题层级而不产生横向溢出。 */
+  .training-heading .eyebrow { letter-spacing:.02em; } /* 在窄屏上减少引导标题字距。 */
+  .training-heading>.status-pill { margin-top:0; max-width:none; } /* 允许状态标签使用完整行宽。 */
+  .training-phases { padding:8px; gap:4px; margin-bottom:10px; } /* 紧凑排列仍完整保留的三个处理阶段并减少到控制区的距离。 */
+  .phase { font-size:14px; gap:4px; flex-direction:column; white-space:normal; text-align:center; } /* 将阶段图标置于文字上方而非压缩字体。 */
+  .training-phases>svg { width:12px; } /* 缩减纯装饰箭头占用的横向空间。 */
+  .network-head { flex-wrap:wrap; margin-bottom:10px; gap:8px; } /* 将轮次和观察类别在必要时分为两行。 */
+  .probe-tabs { gap:3px; } /* 保持三种观察颜色紧凑。 */
+  .probe-tabs button { min-height:44px; min-width:52px; padding:8px 12px; } /* 在触屏上保证所有类别切换有完整热区。 */
+  .network-stage { grid-template-columns:minmax(0,1fr); padding:12px; gap:9px; min-height:0; } /* 让真实照片和网络图在手机端上下展示。 */
+  .probe-photo { display:grid; grid-template-columns:74px minmax(0,1fr); grid-template-rows:auto auto; align-items:center; justify-content:start; gap:3px 12px; padding:0 0 10px; border-bottom:1px solid #526377; } /* 将训练照片收成清晰横条而不挤压网络宽度。 */
+  .probe-image-wrap { grid-column:1; grid-row:1/3; width:74px; border-radius:7px; } /* 在手机网络图上方保留真实照片。 */
+  .probe-photo>span { grid-column:2; grid-row:1; align-self:end; } /* 把观察提示放在缩略图右侧。 */
+  .probe-photo>strong { grid-column:2; grid-row:2; align-self:start; } /* 将实际颜色标签紧邻训练照片展示。 */
+  #networkCanvas { height:224px; } /* 使用完整手机宽度绘制实际网络连接。 */
+  .network-captions { padding:0 3px; } /* 给窄屏输出标签保留最大宽度。 */
+  .training-metrics { gap:8px; padding:17px 0; } /* 三个主要指标仍保持同屏可比较。 */
+  .training-metrics>div { padding-left:8px; gap:5px; } /* 缩减指标之间的空白而不缩小文字。 */
+  .training-metrics strong { font-size:25px; } /* 在手机上维持醒目的真实数字。 */
+  .training-metrics strong small { font-size:14px; } /* 使总数可以与指标一起完整显示。 */
+  .training-metrics span,.training-metrics em { font-size:14px; } /* 确保指标名称与比较说明达到正文最小字号。 */
+  .chart-heading { flex-wrap:wrap; gap:4px; } /* 允许曲线状态自然换行避免标题遮挡。 */
+  .chart-wrap,#lossCanvas { height:160px; } /* 在手机保留可读的损失曲线高度。 */
+  .timeline { flex-wrap:wrap; gap:8px; margin-bottom:9px; } /* 使回到当前按钮在必要时单独换行。 */
+  .timeline>.text-button { margin-left:auto; } /* 把回到实际训练的入口靠右放置。 */
+  .training-actions { gap:8px; padding:0 0 12px; margin-bottom:8px; } /* 在窄屏中让训练控制自然分行且不增加多余上方留白。 */
+  .pace-control { flex-basis:100%; margin-right:0; justify-content:space-between; } /* 在窄屏中单独一行显示训练节奏。 */
+  .training-actions>.primary-button { flex:1; min-width:140px; } /* 让主操作充分占据手机可触摸宽度。 */
+  .training-actions>.secondary-button { flex:1; padding:10px 9px; } /* 保持暂停与单步按钮并排且不被挤小。 */
+  .exam-result { grid-template-columns:minmax(0,1fr); padding:12px 0 22px; gap:18px; } /* 在手机结果页依次展示照片和模型答案。 */
+  .exam-result>img { max-width:none; } /* 让独立检验照片在手机中清楚可见。 */
+  .exam-answer h3 { font-size:29px; } /* 为真实检验结果保持足够强调。 */
+  .exam-summary { gap:9px; padding:18px 0; grid-template-columns:1fr 1fr; } /* 防止三个大指标在窄屏发生相互覆盖。 */
+  .exam-summary>div { padding-left:10px; } /* 缩减手机结果指标的空白。 */
+  .exam-summary>div:last-child { grid-column:1/-1; padding:13px 0 0; border-left:0; border-top:1px solid var(--line); margin-top:5px; } /* 将本轮完整结论独立成行展示。 */
+  .exam-summary strong { font-size:25px; } /* 让独立检验答对数字仍易于辨认。 */
+  .exam-history { grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; } /* 手机一行三张记录可对应三种颜色。 */
+  .exam-history-card { padding:5px; } /* 降低历史卡片装饰占用以展示更多照片。 */
+  .history-heading { gap:8px; margin-top:18px; } /* 为检验记录标题和导出入口留出空间。 */
+  .results-actions { gap:8px; } /* 在结果页底部紧凑排列辅助操作。 */
+  .results-actions>button { flex:1; min-width:140px; padding:10px; } /* 避免改进样本与回看训练按钮窄到难点。 */
+  .dialog-header,.dialog-body { padding:18px; } /* 在手机对话框中回收多余空白。 */
+  .name-fields { grid-template-columns:minmax(0,1fr); } /* 让三个颜色名称在手机上逐行编辑。 */
+  .project-buttons { grid-template-columns:minmax(0,1fr); } /* 防止课堂文件操作名称被截断。 */
+  .toast { bottom:15px; padding:12px 16px; font-size:15px; } /* 保持手机操作通知清楚但不过度遮挡。 */
+} /* 结束手机与立式触屏适配。 */
+@media (orientation:portrait) and (min-width:951px) { /* 为1080像素竖屏课堂大屏使用真正的纵向布局。 */
+  .workspace { grid-template-columns:minmax(0,1fr); } /* 避免在窄长的大屏上保留桌面双栏。 */
+  .capture-column { grid-template-columns:minmax(0,1fr) minmax(0,1fr); align-items:start; gap:22px; } /* 在竖屏上半部并列展示相机和采集操作。 */
+  .workspace[data-view="train"] .training-stage { order:-1; } /* 训练开始时让真实学习舞台出现在首屏。 */
+  #networkCanvas { height:320px; } /* 充分利用竖屏高度展示神经网络变化。 */
+  .chart-wrap,#lossCanvas { height:200px; } /* 为远距离观察增加损失曲线高度。 */
+  .training-metrics strong { font-size:38px; } /* 放大竖屏展教时的核心训练数字。 */
+} /* 结束竖屏大屏适配。 */
+@media (orientation:portrait) { /* 在所有竖屏中把训练阶段集中到当前学习舞台。 */
+  .workspace[data-view="train"] .capture-column { display:none; } /* 训练时隐藏暂不用的相机与样本附页，切回采集或检验步骤后立即恢复。 */
+} /* 结束竖屏训练专注模式。 */
+@media (prefers-reduced-motion:reduce) { /* 尊重用户减少界面动画的系统偏好。 */
+  *,*::before,*::after { transition:none!important; animation:none!important; scroll-behavior:auto!important; } /* 保留实际训练数据刷新并关闭不必要的界面动效。 */
+} /* 结束减少动态效果设置。 */

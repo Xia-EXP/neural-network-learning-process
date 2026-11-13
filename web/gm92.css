@@ -1,0 +1,50 @@
+body.remote-panel.gm92 { --top:64px; --nav:88px; --sys-bottom:0px; height:var(--app-h,100vh); background:#f3f6f5; } /* Use the measured GM92 browser height, including system-bar deductions. */
+body.remote-panel.gm92 main,body.remote-panel.gm92[data-lesson-view] main { height:calc(var(--app-h,100vh) - var(--top) - var(--nav) - var(--sys-bottom)); grid-template-columns:minmax(0,1fr); grid-template-rows:none; grid-auto-rows:auto; align-content:start; overflow-y:auto; padding:16px 20px; gap:16px; overscroll-behavior:contain; } /* Stack every classroom stage in portrait and keep all content reachable by touch scrolling. */
+body.remote-panel.gm92 #touchViews { bottom:var(--sys-bottom); height:var(--nav); padding:8px 12px; } /* Keep the four teaching steps above optional Android navigation overlays. */
+body.remote-panel.gm92 #touchViews button { border-radius:8px; } /* Retain stable touch targets without oversized rounded frames. */
+body.remote-panel.gm92 .stage,body.remote-panel.gm92 .concept-section,body.remote-panel.gm92 .outcome-section { border-radius:0; min-width:0; overflow:visible; } /* Allow each full-width teaching area to grow inside the scrolling viewport. */
+body.remote-panel.gm92 .gm92-link { font-size:12px; white-space:nowrap; color:#fff; } /* Report the actual camera relay state in the top toolbar. */
+body.remote-panel.gm92 .remote-hint { border-radius:4px; background:#e4f1ed; } /* Preserve the current workflow status in a compact strip. */
+body.remote-panel.gm92 .remote-hint::before { content:none; } /* Keep the status strip free of decorative symbols. */
+body.remote-panel.gm92[data-lesson-view=label] .infer-stage { display:flex !important; flex-direction:column; gap:14px; grid-column:1; grid-row:auto; } /* Put the shared picture, class buttons and training command in reading order. */
+body.remote-panel.gm92[data-lesson-view=label] .infer-stage .viewfinder,body.remote-panel.gm92[data-lesson-view=result] .infer-stage .viewfinder { width:var(--vf-w,100%); height:calc(var(--vf-w,400px) * .75); max-width:100%; max-height:none; flex:none; aspect-ratio:auto; margin:0 auto; align-self:center; } /* Size the camera picture in pixels with a stable 4:3 ratio on older WebViews. */
+body.remote-panel.gm92[data-lesson-view=label] .touch-label-section { margin:0; padding:0; display:block; } /* Place semantic labeling directly beneath the current sample. */
+body.remote-panel.gm92[data-lesson-view=label] .touch-label-section h4 { margin:0 0 12px; font-size:20px; } /* Keep the question close to the three class choices. */
+body.remote-panel.gm92[data-lesson-view=label] .touch-labels { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; } /* Reserve equal, stable widths for the three collection commands. */
+body.remote-panel.gm92[data-lesson-view=label] .touch-label { min-width:0; min-height:100px; padding:12px 8px; font-size:22px; display:flex; flex-direction:column; justify-content:center; gap:8px; border:2px solid var(--c); border-radius:8px; background:#fff; color:#223c35; overflow-wrap:anywhere; } /* Provide large readable tap targets with solid-color fallbacks. */
+body.remote-panel.gm92[data-lesson-view=label] .touch-label::after { margin:0; font-size:14px; border-radius:4px; } /* Keep saved counts aligned beneath each class name. */
+body.remote-panel.gm92 .gm92-train-box { display:none; } /* Hide collection-only controls on other teaching steps. */
+body.remote-panel.gm92[data-lesson-view=label] .gm92-train-box { display:grid; gap:8px; } /* Expose the actual start-training command directly after sample collection. */
+body.remote-panel.gm92 #gm92Train { min-height:64px; width:100%; font-size:22px; border-radius:8px; } /* Let students start learning without needing the teacher's computer. */
+body.remote-panel.gm92 .gm92-note { font-size:14px; color:#52665f; line-height:1.5; overflow-wrap:anywhere; } /* State the real sample prerequisite next to the disabled command. */
+body.remote-panel.gm92[data-lesson-view=label] .infer-stage { grid-row:2; } /* Keep live collection before the sample archive regardless of source document order. */
+body.remote-panel.gm92[data-lesson-view=label] .data-stage { grid-column:1; grid-row:3; overflow:visible; } /* Put calibration and saved examples below the primary student commands. */
+body.remote-panel.gm92 #classList { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; } /* Compare the three saved classes in one compact row. */
+body.remote-panel.gm92 .class-record { min-width:0; padding:10px; border-radius:8px; } /* Keep each repeated sample record within its grid track. */
+body.remote-panel.gm92 .class-record .capture-button { display:none; } /* Use the primary single-tap collection controls above the records. */
+body.remote-panel.gm92 .thumbnails { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); height:auto; } /* Keep thumbnail dimensions independent of varying sample counts. */
+body.remote-panel.gm92 .thumbnails > :nth-child(n+4) { display:none; } /* Preview three samples per class while preserving every stored photograph. */
+body.remote-panel.gm92 .reference-actions button { min-height:48px; } /* Make white-reference calibration accessible to fingers. */
+body.remote-panel.gm92[data-lesson-view=train] .train-stage { display:flex !important; flex-direction:column; gap:12px; } /* Show the measured learning process vertically on the GM92 screen. */
+body.remote-panel.gm92[data-lesson-view=train] .network-wrap { height:360px; min-height:260px; flex:none; width:100%; } /* Reserve a visible network canvas before drawing activations. */
+body.remote-panel.gm92[data-lesson-view=train] .chart-wrap { height:150px; flex:none; } /* Keep the measured loss chart visible below the real training controls. */
+body.remote-panel.gm92 .lesson-controls { flex-wrap:wrap; gap:12px; } /* Keep pause and single-step controls inside narrow browser viewports. */
+body.remote-panel.gm92[data-lesson-view=concept] .concept-body { grid-template-columns:minmax(0,1fr); } /* Present the learned color wheel above the class definitions. */
+body.remote-panel.gm92[data-lesson-view=concept] .wheel-panel { position:static; max-width:520px; width:100%; } /* Center the touchable wheel without overlapping subsequent content. */
+body.remote-panel.gm92[data-lesson-view=concept] .wheel-wrap { width:100%; min-width:0; } /* Avoid relying on dynamic viewport units to fit the color wheel. */
+body.remote-panel.gm92 .concept-heading,body.remote-panel.gm92 .concept-tools { flex-wrap:wrap; gap:12px; } /* Wrap tone choices instead of clipping them beside the heading. */
+body.remote-panel.gm92[data-lesson-view=result] .infer-stage { overflow:visible; grid-column:1; } /* Keep the new-sample examination command reachable below its preview. */
+body.remote-panel.gm92[data-lesson-view=result] #challenge { margin-top:12px; flex:none; } /* Prevent the examination button from shrinking against camera content. */
+body.remote-panel.gm92[data-lesson-view=result] .outcome-section { grid-column:1; } /* Place the observed examination results after the new-sample controls. */
+body.remote-panel.gm92 dialog { max-height:calc(var(--app-h,100vh) - 40px); overflow-y:auto; } /* Keep modal calibration and examination actions reachable above system bars. */
+body.remote-panel.gm92 button,body.remote-panel.gm92 select { touch-action:manipulation; } /* Avoid delayed double-tap handling on classroom controls. */
+@media (max-width:700px) { /* Adapt to a FHD panel reporting a smaller CSS viewport at higher device pixel ratios. */
+body.remote-panel.gm92 { --top:60px; --nav:84px; } /* Reserve predictable toolbar dimensions on dense browser viewports. */
+body.remote-panel.gm92 main,body.remote-panel.gm92[data-lesson-view] main { padding:10px; gap:12px; } /* Recover usable teaching space without reducing touch targets. */
+body.remote-panel.gm92 .gm92-link,body.remote-panel.gm92 #stateBadge { display:none; } /* Leave room for settings, recovery, connection help and fullscreen controls. */
+body.remote-panel.gm92 #reset { font-size:0; width:42px; padding:0; } /* Keep the familiar reset icon accessible in the narrow header. */
+body.remote-panel.gm92[data-lesson-view=label] .touch-label { font-size:18px; min-height:100px; } /* Keep class choices readable in the smaller CSS viewport. */
+body.remote-panel.gm92 .class-record .class-heading { flex-wrap:wrap; } /* Wrap class metadata rather than allowing horizontal overflow. */
+body.remote-panel.gm92[data-lesson-view=train] .network-wrap { height:280px; } /* Fit a meaningful network view above the controls at smaller heights. */
+body.remote-panel.gm92 .outcome-content { grid-template-columns:minmax(0,1fr) !important; } /* Stack examination scores and details on narrower screens. */
+} /* Finish the high-density viewport overrides. */

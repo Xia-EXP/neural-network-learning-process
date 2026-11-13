@@ -1,0 +1,41 @@
+.sample-learning-result { padding:4px 0 14px; min-width:0; } /* Keep actual sample outcomes in the main unframed result area. */
+.sample-result-heading { display:flex; flex-direction:column; gap:8px; margin:0 0 18px; } /* Separate the section identity from its current measured state. */
+.sample-result-heading > span { font-size:13px; color:#527367; } /* Give the result section a restrained label. */
+.sample-result-heading > strong { font-size:22px; line-height:1.4; } /* Keep the result heading readable on both exhibit screens. */
+#sampleLearningCards { display:grid; gap:12px; } /* Reserve one stable row for each taught class. */
+.sample-learning-card { display:grid; grid-template-columns:84px minmax(0,1fr); gap:6px 12px; padding:12px; border:1px solid #d5e2dd; border-radius:6px; min-width:0; background:#fff; } /* Frame only the individual repeated sample outcomes. */
+.sample-learning-card img { width:84px; height:63px; object-fit:cover; grid-row:1/4; border-radius:4px; } /* Show the actual saved probe without changing its aspect ratio. */
+.sample-learning-card > strong { font-size:18px; overflow-wrap:anywhere; } /* Fit arbitrary student-defined class names safely. */
+.sample-learning-card > span { font-size:12px; color:#52675e; overflow-wrap:anywhere; } /* Keep human-provided labels distinct from model answers. */
+.sample-learning-card > div { display:flex; flex-wrap:wrap; gap:6px 16px; font-size:13px; line-height:1.5; overflow-wrap:anywhere; } /* Compare measured early and late answers without overflowing narrow cards. */
+.sample-learning-card > div b { color:#176e51; } /* Highlight the latest real answer without asserting it is correct. */
+#sampleResultNote { font-size:13px; line-height:1.7; color:#50665c; margin:16px 0; } /* Keep the limits of training recall visible beside the result. */
+#sampleResultExam { width:100%; min-height:48px; border-radius:6px; } /* Give independent new-picture examination a prominent touch target. */
+#learnCorrection { width:100%; min-height:48px; margin-top:12px; white-space:normal; line-height:1.5; border-radius:6px; } /* Make the explicit wrong-answer correction reachable on both exhibit screens. */
+#colorExperiment { border-top:1px solid #d5e2dd; margin-top:10px; padding-top:14px; min-width:0; } /* Make synthetic color extrapolation secondary to actual sample learning. */
+#colorExperiment > summary { cursor:pointer; min-height:44px; font-size:15px; font-weight:600; color:#275e4b; padding:8px 0; } /* Use a familiar disclosure control for the optional color experiment. */
+#colorExperiment[open] > .concept-heading { margin-top:12px; } /* Space the original measured map heading below its disclosure. */
+#probeRegionWarning { color:#83581d; background:#fff3d9; padding:12px; font-size:13px; line-height:1.6; border-left:3px solid #c28c35; } /* Disclose unreliable foreground isolation next to the affected synthetic experiment. */
+#learningProcess { grid-column:1/-1; padding:10px 0; border-bottom:1px solid #d5e2dd; margin-bottom:10px; min-width:0; } /* Put actual learning phases near the real network visualization. */
+.process-steps { display:flex; flex-wrap:wrap; align-items:center; gap:8px; color:#61766d; font-size:12px; } /* Keep the sample-to-examination progression visible in compact layouts. */
+.process-steps svg { width:14px; height:14px; } /* Fit familiar direction icons between phase labels. */
+.process-steps .complete { color:#146a4e; font-weight:700; } /* Mark only genuinely completed phases. */
+.process-readout { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:10px; } /* Keep the live extraction or round count beside the result command. */
+.process-readout > strong { font-size:15px; line-height:1.5; overflow-wrap:anywhere; } /* Make actual progress legible without hero-size panel typography. */
+body.remote-panel .sample-learning-result { order:-1; } /* Put real sample outcomes before the optional color experiment on touch screens. */
+body.remote-panel #colorExperiment { order:0; } /* Preserve portrait scrolling order after the primary outcome. */
+body.exhibit-training:not(.remote-panel) .train-stage { position:fixed; inset:66px 20px 20px; z-index:25; display:grid; grid-template-columns:minmax(0,1.8fr) minmax(290px,1fr); grid-auto-rows:auto; gap:8px 24px; overflow-y:auto; padding:20px; background:#fff; border:1px solid #d5e2dd; box-shadow:0 10px 32px #12382b22; } /* Automatically devote the desktop exhibition surface to genuine training while retaining all real controls. */
+body.exhibit-training:not(.remote-panel) .train-stage > * { grid-column:2; min-width:0; } /* Keep the measured controls in a stable right-hand column. */
+body.exhibit-training:not(.remote-panel) .train-stage .stage-heading,body.exhibit-training:not(.remote-panel) #learningProcess { grid-column:1/-1; margin:0; } /* Span phase progress and the exit command across the enlarged training surface. */
+body.exhibit-training:not(.remote-panel) .train-stage .learning-sample { display:flex; grid-column:1; grid-row:3; } /* Preserve the real observation photo and its label even on short laptop screens. */
+body.exhibit-training:not(.remote-panel) .train-stage .network-wrap { grid-column:1; grid-row:4/16; width:100%; height:100%; min-height:300px; } /* Give the sampled true network most of the visible learning space. */
+body.exhibit-training:not(.remote-panel) .train-stage .chart-wrap { height:120px; flex:none; } /* Reserve a clear measured loss curve beside the network. */
+body.exhibit-training:not(.remote-panel) .process-steps { font-size:16px; gap:12px; } /* Make the labeled phases readable across the exhibition space. */
+body.exhibit-training:not(.remote-panel) .process-readout > strong { font-size:22px; } /* Give the current measured training round clear visual priority. */
+body.exhibit-training:not(.remote-panel) .learning-measures strong { font-size:28px; } /* Enlarge real sample-fit counts and actual parameter changes during learning. */
+body.exhibit-training:not(.remote-panel) .prediction-change { font-size:16px; } /* Keep the observed before-and-after answer legible next to its sample photo. */
+body.exhibit-training:not(.remote-panel) .train-stage .learning-phases,body.exhibit-training:not(.remote-panel) .train-stage .network-legend,body.exhibit-training:not(.remote-panel) .train-stage .chart-caption { display:none; } /* Keep the enlarged process focused on samples, real parameter movement and usable optimizer controls. */
+@media (max-width:820px) { /* Keep the enlarged process usable when the local exhibit browser is narrow. */
+body.exhibit-training:not(.remote-panel) .train-stage { inset:70px 8px 8px; display:flex; flex-direction:column; padding:14px; } /* Stack and scroll rather than clipping controls in a narrow viewport. */
+body.exhibit-training:not(.remote-panel) .train-stage .network-wrap { height:300px; min-height:300px; flex:none; } /* Keep the network canvas nonblank while stacked above the controls. */
+} /* Finish narrow exhibition layout. */

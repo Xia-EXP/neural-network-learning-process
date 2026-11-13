@@ -1,0 +1,160 @@
+.status-line { justify-content:space-between; } /* 将真实采集状态与简短流程分别放在状态行两端。 */
+.dataset-state { min-width:0; font-size:14px; line-height:1.4; color:#2f6c5b; overflow-wrap:anywhere; } /* 以正常字号显示本轮数据是否已训练。 */
+.collection-quality { display:flex; align-items:center; justify-content:flex-end; gap:8px; padding:0; min-width:0; font-size:14px; color:#52665c; } /* 将采集张数与质量状态合并到标题行，为真实取景留出空间。 */
+.collection-quality .text-button { min-height:36px; padding:4px 6px; } /* 紧凑显示质量入口，同时保留清楚的点击范围。 */
+#classCards { display:grid; grid-template-columns:minmax(0,1fr); gap:5px; padding:0 10px; } /* 三个类别各占一条固定高度照片带。 */
+#classCards .class-card { display:grid; grid-template-columns:112px minmax(0,1fr); border-radius:6px; min-height:60px; } /* 类别标签与多张真实照片并排显示。 */
+#classCards .class-select { min-width:0; min-height:60px; padding:3px 6px; justify-content:center; align-items:flex-start; gap:1px; } /* 类别名及两种计数使用稳定的左侧空间。 */
+#classCards .class-title { font-size:14px; line-height:18px; min-width:0; white-space:normal; overflow-wrap:anywhere; } /* 最长类别名称也可自然换行。 */
+#classCards .class-count { display:flex; flex-wrap:wrap; column-gap:6px; font-size:14px; line-height:18px; text-align:left; } /* 两种计数各自保持完整，并按标签列的实际宽度换行。 */
+#classCards .class-count>span { white-space:nowrap; } /* 不拆开不同画面数量中的词语和数字。 */
+#classCards .class-thumbs { display:flex; flex-wrap:nowrap; align-items:center; justify-content:flex-start; gap:5px; min-width:0; min-height:60px; height:60px; padding:4px; overflow-x:auto; overflow-y:hidden; scrollbar-width:thin; } /* 让所有样本在照片带内浏览，照片增加不会撑高主屏。 */
+#classCards .sample-thumb { position:relative; flex:0 0 64px; width:64px; min-width:64px; height:48px; min-height:48px; padding:0; border:1px solid #cbd6cf; border-radius:4px; overflow:hidden; } /* 为每张已保存照片保留固定四比三尺寸和检查热区。 */
+#classCards .sample-thumb img { width:100%; height:100%; object-fit:contain; } /* 展示保存时的完整裁切结果。 */
+.sample-thumb.repeated-photo::after,.sample-thumb.label-conflict::after { content:'重复'; position:absolute; right:0; top:0; padding:0 2px; background:#f8dd9e; color:#5e4718; font-size:14px; line-height:18px; } /* 用可读文字标出完全重复的照片。 */
+.sample-thumb.label-conflict::after { content:'冲突'; background:#b83d34; color:#fff; } /* 同图不同标签使用明确的冲突标记。 */
+#classCards .sample-thumb.just-collected { border:3px solid #24775a; animation:collection-arrival .45s ease-out; } /* 仅在服务器确认保存后突出刚进入类别的新照片。 */
+@keyframes collection-arrival { from { opacity:.45; transform:translateX(12px); } to { opacity:1; transform:translateX(0); } } /* 为采集归类提供短促且不改变布局的反馈。 */
+.network-stage .probe-photo { display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:3px; } /* 把素材概览和固定观察照片明确分成上下两部分。 */
+.network-stage .sample-flow-window { height:46px; min-height:0; width:100%; max-width:94px; } /* 为多素材滚动保留稳定窗口，不挤压真实观察照片。 */
+.observed-photo { display:flex; flex-direction:column; align-items:flex-start; gap:3px; width:100%; margin-top:5px; padding-top:7px; border-top:1px solid #6c838c; color:#d5e3ea; font-size:14px; line-height:18px; } /* 用细分隔线区分整体流向与本轮实际参考。 */
+#probeImage.sample-reference-image { display:block; width:84px; height:63px; aspect-ratio:4 / 3; object-fit:contain; border:1px solid #91a6af; border-radius:4px; } /* 真正显示与网络激活和输出得分对应的保存照片。 */
+.observed-photo .sample-reference { color:#e3ecef; font-size:14px; line-height:18px; overflow-wrap:anywhere; } /* 人工标签与模型得分分别呈现。 */
+.probe-delta { color:#91dfb9; font-size:14px; line-height:18px; word-break:keep-all; } /* 得分变化与百分点单位可分行，但不把中文单位拆成单字。 */
+.probe-delta.decreased { color:#ffb8a7; } /* 得分下降时保留实际负向变化。 */
+.all-reference-photos { display:grid; gap:3px; width:100%; } /* 三类实际参考照片固定分行，样本增加不会扩大观察区。 */
+.all-reference { display:grid; grid-template-columns:36px minmax(0,1fr); align-items:center; gap:4px; min-height:27px; color:var(--class-color); } /* 每行清楚对应一张原图及其人工类别。 */
+.all-reference img { width:36px; height:27px; object-fit:contain; border:1px solid var(--class-color); border-radius:3px; } /* 固定四比三原图尺寸，不裁切真实采集范围。 */
+.all-reference span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px; line-height:18px; } /* 长类别名保留悬停全文且不挤出参考图区域。 */
+.loss-legend { display:flex; align-items:center; justify-content:flex-end; gap:9px; min-width:0; } /* 图例与标题共用一行，保留固定显示器的绘图面积。 */
+.loss-legend>span { display:flex; align-items:center; gap:4px; min-width:0; font-size:14px; line-height:20px; color:#37444c; } /* 每类同时标明线型、名称与本轮真实训练损失。 */
+.loss-legend i { width:14px; flex:none; border-top:3px solid var(--class-color); } /* 图例使用与曲线对应的标签颜色。 */
+.loss-legend>span:nth-child(2) i { border-top-style:dashed; } /* 黄色使用虚线，在曲线重合时仍可辨识。 */
+.loss-legend>span:nth-child(3) i { border-top-style:dotted; } /* 蓝色使用点线，兼顾不同颜色辨识能力。 */
+.loss-legend>span>span { min-width:0; max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } /* 自定义长名称受自身图例宽度约束。 */
+.loss-legend b { font-weight:500; font-variant-numeric:tabular-nums; white-space:nowrap; } /* 实际损失读数保持稳定字符宽度。 */
+.loss-legend .muted-series { opacity:.4; } /* 单类观察时弱化未显示曲线的图例。 */
+.class-fit { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; flex:none; } /* 在训练图与误差曲线之间提供按类检查入口。 */
+.class-fit>button { min-width:0; min-height:44px; justify-content:flex-start; gap:5px; padding:5px 6px; font-size:14px; border-radius:4px; } /* 每个类别具有稳定且可点开的实际答对计数。 */
+.class-fit>button>span:not(.color-dot) { min-width:0; overflow-wrap:anywhere; } /* 长类别名在自身网格内换行。 */
+.class-fit b { margin-left:auto; font-size:14px; white-space:nowrap; font-variant-numeric:tabular-nums; } /* 对齐三类计数并避免数字变化影响布局。 */
+.class-fit .has-errors { background:#fff0e9; color:#a63e2a; } /* 只在真实存在错误照片时强调检查入口。 */
+.gallery-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; color:#5d6e65; font-size:14px; } /* 在原有图库提供直接的照片筛选。 */
+.sample-library-actions { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 10px; } /* 检查照片与批量删除共用原有底部一行，保持桌面同屏。 */
+.sample-library-actions>button { flex:1; min-width:0; min-height:40px; padding:4px 6px; font-size:14px; gap:5px; } /* 两个操作使用稳定点击高度，小屏也不挤出照片区域。 */
+.sample-library-actions #openGallery { margin:0; } /* 覆盖旧图库按钮的自动居中外边距，保持两侧操作均匀分配。 */
+#openSampleDelete { color:#a3382d; } /* 用明确的删除色区分照片查看与数据清理。 */
+#sampleDeleteDialog { border-radius:8px; } /* 删除窗口沿用工作台克制的圆角规格。 */
+#sampleDeleteScope { width:100%; min-height:44px; } /* 让类别与全部范围选择具有完整的触控热区。 */
+#sampleDeleteSummary { min-height:96px; } /* 切换范围或显示样本变化时保持确认按钮位置稳定。 */
+.gallery-empty { grid-column:1 / -1; padding:20px 0; color:#66756c; } /* 空结果保持明确且不伪造照片。 */
+.comparison-entry { display:flex; flex:none; width:100%; min-height:64px; align-items:center; justify-content:flex-start; gap:8px; padding:8px 0; margin-top:6px; border-top:1px solid #dce3dc; border-radius:0; text-align:left; } /* 将训练对比作为紧凑的工作流入口。 */
+.comparison-entry>span { display:flex; flex:1; min-width:0; flex-direction:column; gap:2px; } /* 为两行历史状态保留可换行空间。 */
+.comparison-entry strong,.comparison-entry small { font-size:14px; line-height:19px; overflow-wrap:anywhere; } /* 以正常字号区分入口名称和已保存数据。 */
+.comparison-entry small { color:#557267; font-weight:400; } /* 让共同检验结果保持可读而不过分抢眼。 */
+#comparisonDialog { width:min(900px,calc(100vw - 32px)); max-height:calc(100vh - 40px); border-radius:8px; } /* 在同页查看完整比较，不扩大主工作台高度。 */
+.comparison-state { margin:0 0 14px; color:#53685e; font-size:14px; line-height:1.5; } /* 明确历史结果与当前活动模型的状态关系。 */
+.run-table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:14px; } /* 让两轮摘要使用相同列宽方便对照。 */
+.run-table th,.run-table td { padding:9px 8px; border-bottom:1px solid #e0e6df; text-align:left; vertical-align:top; overflow-wrap:anywhere; } /* 样本分布和长名称自然换行，不遮盖邻列。 */
+.run-table th:first-child { width:25%; } /* 给指标名称留出独立且受控的宽度。 */
+.run-table thead { background:#edf3ef; } /* 用克制底色区分两轮的列标题。 */
+.history-chart { height:198px; margin:16px 0; } /* 给历史实际曲线提供稳定尺寸。 */
+.history-chart-key { display:flex; justify-content:flex-end; gap:16px; height:26px; font-size:14px; } /* 显示两条曲线的明确时间对应。 */
+.history-chart-key span::before { content:''; display:inline-block; width:20px; height:3px; margin:0 6px 3px 0; background:#bf6246; } /* 橙红线对应上一次完成的真实训练。 */
+.history-chart-key span:last-child::before { background:#237d67; } /* 绿色线对应最近完成的真实训练。 */
+#comparisonLoss { display:block; width:100%; height:172px; } /* 画布完整使用固定历史绘图区。 */
+.comparison-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:20px 0 10px; } /* 让独立检验计数与逐图证据分别可扫描。 */
+.comparison-heading h3 { font-size:17px; } /* 对比详情使用适合工具窗口的标题字号。 */
+.comparison-heading>span,.benchmark-summary { color:#526b5e; font-size:14px; line-height:1.5; } /* 显示共同照片数、类别覆盖和排除范围。 */
+.benchmark-summary { margin:0 0 10px; } /* 将可比较的实际结果放在逐张照片前面。 */
+.benchmark-row { display:grid; grid-template-columns:72px minmax(60px,.7fr) minmax(0,1fr) minmax(0,1fr); align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #e0e6df; font-size:14px; } /* 同一张独立照片的两轮答案在同一行比较。 */
+.benchmark-row img { width:64px; height:48px; object-fit:contain; border-radius:4px; } /* 保留实际检验照片的完整画面。 */
+.benchmark-row strong,.benchmark-row span { min-width:0; overflow-wrap:anywhere; } /* 防止长类别名盖住相邻答案。 */
+.benchmark-bank { display:grid; grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:10px; max-height:300px; overflow:auto; } /* 在详情内浏览全部固定检验照片。 */
+.benchmark-photo { min-width:0; margin:0; } /* 清除图注默认外边距，保持检验照片整齐排列。 */
+.benchmark-photo img { width:100%; aspect-ratio:4 / 3; object-fit:contain; border:1px solid #cddcd2; border-radius:4px; } /* 展示保存的原检验照片而不重新取当前视频。 */
+.benchmark-photo figcaption { display:flex; flex-direction:column; gap:1px; padding:4px 0; font-size:14px; line-height:19px; overflow-wrap:anywhere; } /* 同时显示人工类别和照片当前用途。 */
+.benchmark-photo figcaption span { color:#327759; } /* 绿色标记仍保持独立的检验照片。 */
+.benchmark-photo.in-training figcaption span { color:#aa4a33; } /* 补入训练的照片明确失去独立检验资格。 */
+@media (min-width:1100px) and (min-height:680px) and (orientation:landscape) { /* 固定横屏维持采集、训练和验证同屏可见。 */
+  :root { --collection-preview:clamp(132px,calc(100vh - 630px),340px); } /* 为三条样本带和完整演示控件预算真实高度。 */
+  .capture-column:has(#demoControls[hidden]) { --collection-preview:clamp(176px,calc(100vh - 586px),380px); } /* 实际摄像头模式把没有演示控件占用的空间交给真实画面。 */
+  .capture-column:has(#cameraError:not([hidden])) { --collection-preview:clamp(120px,calc(100vh - 650px),300px); } /* 摄像头故障时给恢复提示保留空间，避免压住采集标签。 */
+  .workspace { grid-template-columns:minmax(320px,1.4fr) minmax(480px,1.8fr) minmax(230px,.8fr); } /* 约按三十五、四十五、二十的比例分配采集、训练和验证。 */
+  .workspace>.panel,.capture-column>.panel { border-radius:8px; } /* 让工作区域使用克制且一致的边界。 */
+  .viewfinder { flex:none; min-height:0; max-height:none; height:auto; width:min(calc(100% - 24px),calc(var(--collection-preview)*4/3)); aspect-ratio:4 / 3; } /* 取景框按真实四比三和可用高度放大。 */
+  .photo-actions { display:grid; grid-template-columns:minmax(0,1fr) 48px; align-items:start; column-gap:6px; padding:0 12px 8px; } /* 将人工标签与快门并排，节省出的空间用于更多真实照片。 */
+  .photo-actions .exam-labels { margin:0; } /* 标签和快门保持同一条操作基线。 */
+  .photo-actions .capture-button { width:48px; min-width:48px; min-height:44px; height:44px; padding:10px; border-radius:6px; } /* 采用熟悉的相机图标快门，完整名称由悬停与读屏提供。 */
+  .photo-actions .capture-button>span { display:none; } /* 当前人工类别已在相邻标签中明确显示。 */
+  .photo-actions .action-hint { grid-column:1 / -1; } /* 必要的数量限制提示始终占用完整一行。 */
+  .samples-card .panel-heading { padding-top:4px; padding-bottom:0; min-height:44px; flex-wrap:wrap; } /* 在正常触控高度内同时容纳样本标题与质量状态。 */
+  .samples-card #openGallery { min-height:40px; } /* 保持完整图库入口在固定屏内可见。 */
+  .network-stage { grid-template-columns:98px minmax(0,1fr); min-height:220px; } /* 同时容纳流动素材和本轮观察照片，网络图吸收剩余空间。 */
+  .network-captions { grid-template-columns:.27fr .27fr .46fr; text-align:left; } /* 让输出前后得分的说明拥有足够宽度。 */
+  .network-captions>span { min-width:0; overflow-wrap:anywhere; } /* 长短标签分别留在自身列内。 */
+  .training-metrics { padding:5px 0 3px; min-height:0; } /* 把实际训练读数与分类检查紧凑组织。 */
+  .training-metrics>div { gap:0; } /* 减少重复空隙而保留正常文字尺寸。 */
+  .training-metrics em { font-size:14px; line-height:18px; } /* 原始首轮数据和参数变化仍保持可读。 */
+  #resultsStage #examEmpty { flex:1 1 auto; grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(100px,1fr) auto auto; align-items:stretch; min-height:0; padding:5px 0; row-gap:4px; } /* 将实时识别压缩为验证工具，主要屏幕空间交给采集和训练。 */
+  #resultsStage .live-preview-wrap { grid-column:1; grid-row:1; width:100%; min-height:0; max-height:180px; height:100%; aspect-ratio:auto; } /* 验证画面的高度受限，保持左侧采集画面更突出。 */
+  #resultsStage .live-prediction-caption { grid-column:1; grid-row:2; flex-direction:row; justify-content:space-between; align-items:center; gap:6px; } /* 将当前类别和模型状态压缩在同一行。 */
+  #livePredictionLabel { font-size:23px; } /* 在紧凑验证区域保留清楚的当前答案。 */
+  #resultsStage .live-prediction-scores { grid-column:1; grid-row:3; } /* 三类真实得分仍完整展示。 */
+  #resultsStage #examHistory { display:none; } /* 完整检验记录从同页记录窗口查看，主屏优先呈现采集和训练。 */
+  #resultsStage .exam-summary { margin-top:3px; padding:6px 0; } /* 保留独立检验计数并控制验证列的高度。 */
+  #resultsStage .history-heading { margin:0; } /* 以原有入口访问全部检验照片。 */
+  #resultsStage .results-actions { padding-top:0; } /* 收紧低频辅助操作间距。 */
+  #resultsStage .results-actions>button { padding:5px 3px; gap:4px; } /* 较窄验证列也完整容纳两个辅助按钮。 */
+} /* 结束固定横屏的采集训练布局。 */
+@media (min-width:1100px) and (min-height:680px) and (max-height:780px) and (orientation:landscape) { /* 让七百二十和七百六十八像素高的固定屏保留完整流程。 */
+  :root { --collection-preview:132px; } /* 对较矮演示屏明确预留全部拍照操作高度。 */
+  .collection-quality { min-height:28px; } /* 质量数量保持一行，避免额外段落挤压拍摄区。 */
+  .collection-quality .text-button { min-height:28px; padding:2px 4px; } /* 在较矮固定屏压缩质量入口的装饰高度。 */
+  #classCards .class-card { min-height:54px; } /* 三类样本带采用稳定且紧凑的行高。 */
+  #classCards .class-select { min-height:54px; } /* 标签仍保持至少四十四像素可操作高度。 */
+  #classCards .class-thumbs { min-height:54px; height:54px; padding-top:2px; padding-bottom:2px; } /* 保留四十八像素真实照片，不缩小图片来适应数量。 */
+  .network-stage { min-height:176px; grid-template-columns:88px minmax(0,1fr); } /* 在矮屏仍让实际参考照片和网络结构共存。 */
+  .network-stage .flow-heading,.observed-photo>#probeContext { display:none; } /* 当前轮次已在图上方显示，矮屏省去重复标题。 */
+  .network-stage .sample-flow-window { height:30px; } /* 保留素材滚动的可见入口，并让出实际观察照片的高度。 */
+  .loss-legend { gap:5px; } /* 矮屏较窄训练列仍在同一行容纳三类实际读数。 */
+  .loss-legend>span { gap:3px; } /* 缩小图例内部留白而保持文字可读。 */
+  .loss-legend i { width:9px; } /* 紧凑屏用短线型标记释放名称空间。 */
+  .observed-photo { gap:2px; margin-top:2px; padding-top:4px; } /* 将参考原图、人工标签和得分变化紧密关联。 */
+  #probeImage.sample-reference-image { width:72px; height:54px; } /* 矮屏实际参考图依旧显示完整四比三照片。 */
+  .training-phases { min-height:22px; height:22px; margin-bottom:2px; } /* 压缩重复阶段条的留白。 */
+  .training-metrics strong { line-height:1.15; } /* 核心训练数字保留原字号并缩减额外行高。 */
+  .chart-block { flex-basis:124px; } /* 为分类拟合检查腾出少量空间，同时保留醒目的真实曲线。 */
+  .chart-wrap { height:98px; } /* 误差曲线使用明确高度而不被隐藏或裁切。 */
+  #resultsStage #examEmpty { flex:1 1 auto; grid-template-columns:minmax(90px,1.1fr) minmax(0,1fr); grid-template-rows:auto auto; align-content:center; } /* 矮屏将小型验证画面和三类得分并排组织。 */
+  #resultsStage .live-preview-wrap { grid-column:1; grid-row:1 / 3; height:auto; aspect-ratio:4 / 3; max-height:none; } /* 验证画面以真实比例保留完整内容。 */
+  #resultsStage .live-prediction-caption { grid-column:2; grid-row:1; flex-direction:column; align-items:flex-start; } /* 类别和状态在较窄栏内自然上下排列。 */
+  #resultsStage .live-prediction-scores { grid-column:2; grid-row:2; } /* 在同一验证区域完整显示三类结果。 */
+  #resultsStage .live-prediction-scores .score-row { grid-template-columns:28px minmax(12px,1fr) 43px; gap:2px; } /* 为百分比保留稳定宽度，不覆盖类别名称。 */
+} /* 结束较矮固定屏适配。 */
+@media (min-width:1600px) and (min-height:900px) and (orientation:landscape) { /* 大屏增加的面积用于实际照片与训练证据。 */
+  .workspace { grid-template-columns:minmax(420px,1.4fr) minmax(620px,1.8fr) minmax(280px,.8fr); } /* 大屏继续保持采集和训练为主的比例。 */
+  .network-stage { grid-template-columns:112px minmax(0,1fr); } /* 放大实测照片与神经网络之间的可读间距。 */
+  #probeImage.sample-reference-image { width:104px; height:78px; } /* 大屏展示更清晰的实际参考照片。 */
+  #classCards .sample-thumb { flex-basis:80px; width:80px; height:60px; } /* 利用大屏宽度显示更容易辨认的采集照片。 */
+  #classCards .class-thumbs,#classCards .class-card,#classCards .class-select { min-height:72px; height:72px; } /* 样本数量增加仍保持三条稳定照片带。 */
+} /* 结束大屏增强。 */
+@media (max-width:1099px),(max-height:679px),(orientation:portrait) { /* 小窗口和竖屏保持全部操作同页自然排布。 */
+  .status-line { align-items:flex-start; flex-wrap:wrap; } /* 两段状态在窄屏自然换行。 */
+  .network-stage { grid-template-columns:minmax(0,1fr); } /* 窄屏把实际照片放在网络上方而不挤窄输出得分。 */
+  .network-stage .probe-photo { display:grid; grid-template-columns:80px minmax(0,1fr); grid-template-rows:auto auto auto; gap:3px 12px; } /* 整体素材流与实际观察原图并排形成紧凑顶栏。 */
+  .network-stage .sample-flow-window { grid-column:1; grid-row:1 / 3; height:60px; } /* 滚动素材在原有固定窗口内显示。 */
+  .network-stage .flow-heading { display:none; } /* 小屏省去与整体流向标记重复的文字。 */
+  #sampleFlowCount { grid-column:1; grid-row:3; } /* 总素材数跟随滚动窗口。 */
+  .observed-photo { grid-column:2; grid-row:1 / 4; display:grid; grid-template-columns:72px minmax(0,1fr); gap:2px 8px; margin:0; padding:0; border:0; } /* 实测参考照片与人工标签在窄屏仍保持直接关联。 */
+  #probeImage.sample-reference-image { grid-column:1; grid-row:1 / 4; width:72px; height:54px; } /* 保留明确可见的实际观察图。 */
+  .observed-photo>#probeContext,.observed-photo>#probeName,.observed-photo>#probeDelta { grid-column:2; } /* 三行上下文均显示在实际照片旁边。 */
+  .observed-photo[data-mode="all"] { display:flex; flex-direction:column; } /* 窄屏三图仍在实际观察区域内自然排列。 */
+  .observed-photo[data-mode="all"] .all-reference-photos { grid-template-columns:repeat(3,minmax(0,1fr)); } /* 窄屏把三类参考并排放置，保留网络图的宽度。 */
+  .observed-photo[data-mode="all"] .all-reference { display:flex; flex-direction:column; align-items:flex-start; gap:2px; } /* 每张原图的类别紧跟下方，避免缩成不可读的窄行。 */
+  .chart-heading { flex-wrap:wrap; height:auto; } /* 窄屏允许图例换行，不把三类读数覆盖到标题上。 */
+  #networkCanvas { min-height:240px; } /* 窄屏为三层节点和真实得分保留可读空间。 */
+  .comparison-entry { padding:10px 0; } /* 同页自然布局仍保留训练对比入口。 */
+} /* 结束自然排布后备布局。 */
+@media (max-width:480px) { .benchmark-row { grid-template-columns:64px minmax(0,1fr); } .benchmark-row img { grid-row:1 / 3; } .benchmark-row strong { grid-column:2; } .benchmark-row span { grid-column:2; } .run-table th:first-child { width:30%; } .comparison-heading { align-items:flex-start; flex-wrap:wrap; } } /* 手机中的历史对比自然换行，照片和答案不相互覆盖。 */
+@media (prefers-reduced-motion:reduce) { #classCards .sample-thumb.just-collected { animation:none; } } /* 尊重系统减少动画设置，照片高亮仍可保留。 */

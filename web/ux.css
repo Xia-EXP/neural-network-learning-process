@@ -1,0 +1,2209 @@
+﻿/* ===========================================================================
+   三格学习台 · 精修版 v2「仪器台」
+   重改说明：上一版按可读性优先做成浅色后台，太素、太平、还很长。
+   这一版换成深色仪器台：神经网络与颜色是主角，界面退到背景；
+   桌面端整页一屏（100vh），04/05 两段改为浮层舞台，点进度轨才展开。
+   全部规则作用域在 html.ux 下，原版 index.html 与原始样式不受影响。
+   =========================================================================== */
+
+html.ux {
+  /* —— 表面：从最深的画布到最亮的玻璃面板，共 5 层 —— */
+  --bg: #070d0b;
+  --panel: #0c1512;
+  --panel-2: #111d19;
+  --panel-3: #17271f;
+  --panel-glass: rgba(255, 255, 255, .04);
+  --line: rgba(255, 255, 255, .07);
+  --line-2: rgba(255, 255, 255, .13);
+  --line-3: rgba(120, 255, 205, .22);
+
+  /* —— 墨色：4 级，全部在 #0c1512 上达 AA —— */
+  --ink: #f1f8f4;
+  --ink-2: #c6d6ce;
+  --ink-3: #97aaa1;
+  --ink-4: #7d9189;
+
+  /* —— 品牌：薄荷青，用来标"正在发生的事" —— */
+  --brand: #46e2a6;
+  --brand-2: #8bf3c8;
+  --brand-ink: #04241a;
+  --brand-soft: rgba(70, 226, 166, .12);
+  --brand-glow: rgba(70, 226, 166, .38);
+
+  /* —— 数据色：就是三类样本的颜色，只在数据和图表里出现 —— */
+  --c-red: #ff6f61;
+  --c-amber: #f5c65b;
+  --c-blue: #63a9ff;
+  --c-red-soft: rgba(255, 111, 97, .16);
+  --c-amber-soft: rgba(245, 198, 91, .16);
+  --c-blue-soft: rgba(99, 169, 255, .16);
+
+  /* —— 语义色 —— */
+  --ok: #4fe0a0;
+  --warn: #f5c65b;
+  --danger: #ff7d6e;
+  --info: #7fb6ff;
+
+  /* —— 字号：标签 11 / 辅助 12 / 正文 13–14 / 小标题 16 / 标题 20–26 / 数字 34–44 —— */
+  --fs-label: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-16: 16px;
+  --fs-20: 20px;
+  --fs-26: 26px;
+  --fs-34: 34px;
+  --fs-44: 44px;
+
+  /* —— 间距：4 的倍数，8 节奏 —— */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+
+  /* —— 圆角：只有 3 档 + 胶囊，仪器面板统一 16 —— */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  /* —— 层次：面板靠 1px 内高光 + 深投影，不用重阴影 —— */
+  --shadow-1: 0 1px 0 rgba(255, 255, 255, .05) inset, 0 1px 2px rgba(0, 0, 0, .5);
+  --shadow-2: 0 1px 0 rgba(255, 255, 255, .06) inset, 0 24px 60px -32px rgba(0, 0, 0, .9);
+
+  --font-sans: "Inter", "Segoe UI Variable Display", "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "Cascadia Mono", "SF Mono", ui-monospace, Consolas, "Liberation Mono", monospace;
+
+  --focus: 0 0 0 2px var(--bg), 0 0 0 4px var(--brand);
+  --topbar-h: 52px;
+  --status-h: 26px;
+
+  font-size: 14px;
+  background: var(--bg);
+  color-scheme: dark;
+}
+
+/* 画布：一整屏，不滚动。深色底上叠一层极淡的仪器光晕。 */
+html.ux body {
+  display: grid !important;
+  grid-template-rows: var(--topbar-h) auto 1fr auto !important;
+  height: 100vh !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background:
+    radial-gradient(1200px 520px at 18% -8%, rgba(70, 226, 166, .10), transparent 62%),
+    radial-gradient(900px 480px at 88% 4%, rgba(99, 169, 255, .08), transparent 60%),
+    var(--bg) !important;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* main 接管 01–03 的主舞台，宽度铺满，内边距交给各段。 */
+html.ux main {
+  display: grid !important;
+  grid-template-rows: auto 1fr !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 clamp(16px, 2vw, 28px) !important;
+  gap: var(--s-3);
+  overflow: hidden;
+}
+
+html.ux ::selection { background: rgba(70, 226, 166, .26); color: #fff; }
+
+html.ux * { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .16) transparent; }
+html.ux ::-webkit-scrollbar { width: 10px; height: 10px; }
+html.ux ::-webkit-scrollbar-track { background: transparent; }
+html.ux ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, .14);
+  border: 3px solid transparent;
+  border-radius: var(--r-pill);
+  background-clip: content-box;
+}
+html.ux ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .24); background-clip: content-box; }
+
+/* 跳转链接：键盘用户第一下 Tab 就能跳过顶栏。 */
+html.ux .skip-link {
+  position: fixed;
+  left: 50%;
+  top: 8px;
+  z-index: 200;
+  transform: translate(-50%, -160%);
+  padding: 10px 16px;
+  border-radius: var(--r-pill);
+  background: var(--brand);
+  color: var(--brand-ink);
+  font-size: var(--fs-13);
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform .16s ease;
+}
+html.ux .skip-link:focus-visible { transform: translate(-50%, 0); }
+
+/* ---------------------------------------------------------------------------
+   1. 顶栏：一条细带，深色玻璃，不再有渐变和光扫动画
+   --------------------------------------------------------------------------- */
+html.ux .topbar {
+  position: relative;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  height: var(--topbar-h) !important;
+  min-height: var(--topbar-h) !important;
+  padding: 0 clamp(16px, 2vw, 28px) !important;
+  background: rgba(8, 16, 13, .92) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(14px);
+}
+html.ux .topbar::after { display: none !important; }
+
+html.ux .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+html.ux .brand-mark {
+  width: 30px !important;
+  height: 30px !important;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-sm) !important;
+  background: linear-gradient(160deg, rgba(70, 226, 166, .22), rgba(70, 226, 166, .06)) !important;
+  border: 1px solid rgba(70, 226, 166, .30) !important;
+  box-shadow: 0 0 24px -10px var(--brand-glow) !important;
+  color: var(--brand) !important;
+}
+html.ux .brand-mark svg { width: 17px !important; height: 17px !important; stroke-width: 1.8; }
+
+html.ux .topbar h1 {
+  margin: 0 !important;
+  font-size: 15px !important;
+  font-weight: 650 !important;
+  letter-spacing: .01em;
+  color: var(--ink) !important;
+  white-space: nowrap;
+}
+html.ux .brand-sub {
+  margin: 0 !important;
+  font-size: var(--fs-label) !important;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-4) !important;
+}
+
+html.ux .project-tools { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-wrap: nowrap; }
+html.ux .project-tools > * { flex: none; }
+
+html.ux .local-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: var(--r-pill);
+  background: rgba(70, 226, 166, .08) !important;
+  border: 1px solid rgba(70, 226, 166, .22) !important;
+  color: var(--brand) !important;
+  font-size: var(--fs-label) !important;
+  font-weight: 600;
+  letter-spacing: .06em;
+}
+html.ux .local-indicator span { color: var(--brand) !important; font-size: var(--fs-label) !important; }
+
+html.ux .topbar .divider { width: 1px; height: 20px; background: var(--line-2) !important; margin: 0 4px; }
+
+/* ---------------------------------------------------------------------------
+   2. 通用控件：深色底上的三种按钮 + 输入 + 焦点环，热区一律 ≥44px
+   --------------------------------------------------------------------------- */
+html.ux button,
+html.ux input,
+html.ux select,
+html.ux textarea { font-family: inherit; }
+
+html.ux button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-2);
+  background: var(--panel-2);
+  color: var(--ink);
+  font-size: var(--fs-13);
+  font-weight: 600;
+  letter-spacing: .01em;
+  cursor: pointer;
+  transition: background .14s ease, border-color .14s ease, color .14s ease, transform .1s ease;
+}
+html.ux button:not(:disabled):hover { background: var(--panel-3); border-color: var(--line-3); color: #fff; }
+html.ux button:not(:disabled):active { transform: translateY(1px); }
+html.ux button:disabled { opacity: .42; cursor: not-allowed; }
+
+html.ux button:focus-visible,
+html.ux input:focus-visible,
+html.ux select:focus-visible,
+html.ux a:focus-visible,
+html.ux [tabindex]:focus-visible,
+html.ux summary:focus-visible {
+  outline: none !important;
+  box-shadow: var(--focus) !important;
+}
+
+html.ux svg { stroke-width: 1.75; }
+
+html.ux .icon-button {
+  width: 44px !important;
+  height: 44px !important;
+  min-height: 44px;
+  padding: 0 !important;
+  border-radius: var(--r-md);
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--ink-3) !important;
+}
+html.ux .icon-button:not(:disabled):hover { background: var(--panel-3) !important; color: var(--ink) !important; }
+html.ux .icon-button svg { width: 18px !important; height: 18px !important; }
+
+html.ux .quiet-button {
+  min-height: 44px;
+  padding: 0 12px;
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--ink-3) !important;
+  font-size: var(--fs-13) !important;
+  font-weight: 560;
+}
+html.ux .quiet-button:not(:disabled):hover { background: var(--panel-3) !important; color: var(--ink) !important; }
+html.ux .quiet-button svg { width: 16px !important; height: 16px !important; }
+
+/* 主操作：整个页面只有它一个高亮色，训练按钮用。 */
+html.ux .primary-button {
+  min-height: 48px;
+  padding: 0 18px;
+  background: var(--brand) !important;
+  border-color: transparent !important;
+  color: var(--brand-ink) !important;
+  font-size: var(--fs-14) !important;
+  font-weight: 700;
+  letter-spacing: .01em;
+  border-radius: var(--r-md) !important;
+  box-shadow: 0 10px 30px -14px var(--brand-glow) !important;
+}
+html.ux .primary-button:not(:disabled):hover {
+  background: var(--brand-2) !important;
+  color: var(--brand-ink) !important;
+  box-shadow: 0 14px 34px -14px var(--brand-glow) !important;
+}
+html.ux .primary-button svg { width: 18px !important; height: 18px !important; }
+
+html.ux .danger-button { background: rgba(255, 125, 110, .12) !important; border-color: rgba(255, 125, 110, .32) !important; color: var(--danger) !important; }
+html.ux .danger-button:not(:disabled):hover { background: rgba(255, 125, 110, .2) !important; color: #fff !important; }
+
+html.ux .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: var(--r-pill);
+  background: var(--panel-glass) !important;
+  border: 1px solid var(--line-2) !important;
+  color: var(--ink-2) !important;
+  font-size: var(--fs-label) !important;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+html.ux select {
+  min-height: 44px;
+  padding: 0 34px 0 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-2);
+  background-color: var(--panel-2);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2397aaa1' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  color: var(--ink);
+  font-size: var(--fs-13);
+  font-weight: 560;
+  appearance: none;
+}
+html.ux input[type=text],
+html.ux input:not([type]) {
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-2);
+  background: var(--panel-2);
+  color: var(--ink);
+  font-size: var(--fs-14);
+}
+html.ux input::placeholder { color: var(--ink-4); }
+
+html.ux .segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px !important;
+  border-radius: var(--r-md) !important;
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+}
+html.ux .segmented button {
+  min-height: 36px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-radius: calc(var(--r-md) - 3px) !important;
+  background: transparent !important;
+  color: var(--ink-3) !important;
+  font-size: var(--fs-12) !important;
+  font-weight: 600;
+}
+html.ux .segmented button[aria-pressed=true] {
+  background: var(--panel-3) !important;
+  color: var(--ink) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .06) inset !important;
+}
+html.ux .segmented button svg { width: 15px !important; height: 15px !important; }
+
+/* ---------------------------------------------------------------------------
+   3. 课程带：标题与进度合并成一条横条
+   --------------------------------------------------------------------------- */
+html.ux .sessionbar {
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html.ux .lesson-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+html.ux .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  color: var(--ink-4) !important;
+  font-size: var(--fs-label) !important;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+html.ux .eyebrow::before {
+  content: "";
+  width: 16px;
+  height: 1px;
+  background: var(--brand);
+  opacity: .8;
+}
+html.ux .lesson-title h2 {
+  margin: 0 !important;
+  font-size: var(--fs-16) !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.01em;
+  color: var(--ink) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html.ux .mission {
+  margin: 0 !important;
+  max-width: 46ch;
+  font-size: var(--fs-12) !important;
+  line-height: 1.55;
+  color: var(--ink-4) !important;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+html.ux .mission b { color: var(--ink-2) !important; font-weight: 600; }
+
+html.ux .session-controls { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-wrap: nowrap; }
+html.ux .session-controls > * { flex: none; }
+
+/* 进度轨：四个等宽段，当前段亮起，完成段打勾 */
+html.ux .journey {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 2px !important;
+  flex: 1 1 auto;
+  max-width: 620px;
+  margin: 0 !important;
+  padding: 3px !important;
+  list-style: none !important;
+  border-radius: var(--r-md) !important;
+  background: var(--panel) !important;
+  border: 1px solid var(--line) !important;
+}
+html.ux .journey li {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px !important;
+  padding: 0 10px !important;
+  border: 0 !important;
+  border-radius: calc(var(--r-md) - 3px) !important;
+  background: transparent !important;
+  color: var(--ink-4) !important;
+  font-size: var(--fs-12) !important;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .14s ease, color .14s ease;
+  box-shadow: none !important;
+}
+html.ux .journey li:hover { background: var(--panel-2) !important; color: var(--ink-2) !important; }
+html.ux .journey li b {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  background: transparent !important;
+  color: var(--ink-4) !important;
+  font-family: var(--font-mono);
+  font-size: 10px !important;
+  font-weight: 700;
+}
+html.ux .journey li span { color: inherit !important; font-size: var(--fs-12) !important; font-weight: 600; white-space: nowrap; }
+html.ux .journey li small { display: none !important; }
+html.ux .journey li.done { color: var(--ink-3) !important; }
+html.ux .journey li.done b {
+  border-color: transparent !important;
+  background: rgba(70, 226, 166, .18) !important;
+  color: var(--brand) !important;
+  font-size: 0 !important;
+}
+html.ux .journey li.done b::after { content: "✓"; font-size: 10px; }
+html.ux .journey li.current {
+  background: var(--panel-3) !important;
+  color: var(--ink) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .06) inset !important;
+}
+html.ux .journey li.current b {
+  border-color: transparent !important;
+  background: var(--brand) !important;
+  color: var(--brand-ink) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   4. 主舞台：三栏仪器面板，各栏内部滚动但滚动条极细，整页不滚动
+   --------------------------------------------------------------------------- */
+html.ux .workspace {
+  display: grid !important;
+  grid-template-columns: minmax(268px, .76fr) minmax(420px, 1.62fr) minmax(300px, .92fr) !important;
+  gap: var(--s-3) !important;
+  min-height: 0 !important;
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 0 var(--s-3) !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden;
+}
+
+html.ux .stage {
+  position: relative;
+  display: flex !important;
+  flex-direction: column;
+  min-height: 0 !important;
+  max-height: none !important;
+  padding: 0 !important;
+  overflow: auto !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-lg) !important;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel)) !important;
+  box-shadow: var(--shadow-1) !important;
+  scrollbar-gutter: stable;
+}
+html.ux .stage + .stage { border-left: 1px solid var(--line) !important; }
+
+/* 阶段标题：大号描边数字 + 标题 + 一行说明，吸顶 */
+html.ux .stage-heading {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid !important;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 58px !important;
+  margin: 0 !important;
+  padding: 0 var(--s-4) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  background: rgba(12, 21, 18, .94) !important;
+  backdrop-filter: blur(10px);
+}
+html.ux .stage-heading h3 {
+  margin: 0 !important;
+  font-size: var(--fs-16) !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.01em;
+  color: var(--ink) !important;
+  white-space: nowrap;
+}
+html.ux .step-number {
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: var(--r-sm) !important;
+  background: transparent !important;
+  border: 1px solid var(--line-2) !important;
+  color: var(--ink-3) !important;
+  font-family: var(--font-mono) !important;
+  font-size: var(--fs-12) !important;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+html.ux .stage-meta {
+  margin: 0 !important;
+  font-size: var(--fs-label) !important;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-4) !important;
+  text-align: right;
+}
+html.ux .stage-heading .icon-button { margin-right: -8px; }
+
+/* 内容区统一内距 */
+html.ux .stage > *:not(.stage-heading):not(.learning-phases):not(#learningProcess) {
+  padding-left: var(--s-4) !important;
+  padding-right: var(--s-4) !important;
+}
+html.ux .stage > *:first-child:not(.stage-heading) { padding-top: var(--s-4) !important; }
+html.ux .stage > *:last-child { padding-bottom: var(--s-4) !important; }
+html.ux .stage > .learning-phases { padding: var(--s-3) var(--s-4) 0 !important; }
+/* ---------------------------------------------------------------------------
+   5. 阶段 01：样本标定 —— 每个类别一张卡，左缘一条数据色，缩略图紧凑排列
+   --------------------------------------------------------------------------- */
+html.ux #classList { display: flex; flex-direction: column; gap: var(--s-2); padding-top: var(--s-3) !important; }
+
+html.ux .class-record {
+  position: relative;
+  padding: var(--s-3) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-md) !important;
+  background: var(--panel-glass) !important;
+  overflow: hidden;
+  transition: border-color .14s ease, background .14s ease;
+}
+html.ux .class-record::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--c-red);
+}
+html.ux .class-record:nth-child(2)::before { background: var(--c-amber); }
+html.ux .class-record:nth-child(3)::before { background: var(--c-blue); }
+html.ux .class-record:hover { border-color: var(--line-3) !important; background: rgba(255, 255, 255, .05) !important; }
+
+html.ux .class-header { display: flex; align-items: center; gap: 8px; margin-bottom: var(--s-2); }
+html.ux .class-dot { width: 9px !important; height: 9px !important; border-radius: 50% !important; flex: none; box-shadow: 0 0 10px -2px currentColor; }
+html.ux .class-name {
+  font-size: var(--fs-13) !important;
+  font-weight: 650 !important;
+  color: var(--ink) !important;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+html.ux .class-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label) !important;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--ink-4) !important;
+}
+html.ux .delete-class {
+  width: 26px !important;
+  height: 26px !important;
+  min-height: 26px !important;
+  padding: 0 !important;
+  margin-left: 2px;
+  border: 0 !important;
+  border-radius: var(--r-sm) !important;
+  background: transparent !important;
+  color: var(--ink-4) !important;
+  opacity: .7;
+}
+html.ux .delete-class svg { width: 13px !important; height: 13px !important; }
+html.ux .delete-class:not(:disabled):hover { background: rgba(255, 125, 110, .16) !important; color: var(--danger) !important; opacity: 1; }
+
+html.ux .thumbnails {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 3px !important;
+  height: auto !important;
+  margin: 0 0 var(--s-2) !important;
+}
+html.ux .thumbnails img,
+html.ux .empty-slot {
+  width: 100% !important;
+  height: 34px !important;
+  object-fit: cover;
+  border-radius: 5px !important;
+  background: rgba(255, 255, 255, .05) !important;
+  border: 1px solid rgba(255, 255, 255, .06) !important;
+}
+html.ux .empty-slot { display: grid; place-items: center; color: var(--ink-4) !important; }
+html.ux .empty-slot svg { width: 12px !important; height: 12px !important; stroke-width: 2; }
+
+html.ux .capture-button {
+  width: 100%;
+  min-height: 40px !important;
+  justify-content: flex-start !important;
+  gap: 8px;
+  padding: 0 10px !important;
+  border: 1px dashed var(--line-2) !important;
+  border-radius: var(--r-sm) !important;
+  background: transparent !important;
+  color: var(--ink-2) !important;
+  font-size: var(--fs-12) !important;
+  font-weight: 600;
+}
+html.ux .capture-button:not(:disabled):hover { border-color: var(--brand) !important; color: var(--brand) !important; background: var(--brand-soft) !important; }
+html.ux .capture-button.recording { border-style: solid !important; border-color: var(--danger) !important; color: var(--danger) !important; background: rgba(255, 125, 110, .12) !important; }
+html.ux .capture-button svg { width: 15px !important; height: 15px !important; }
+
+html.ux .data-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--s-3) !important;
+  padding: var(--s-3) 0 0 !important;
+  border-top: 1px solid var(--line);
+  color: var(--ink-4) !important;
+  font-size: var(--fs-12) !important;
+  line-height: 1.5;
+}
+html.ux .data-footer svg { width: 14px !important; height: 14px !important; color: var(--brand) !important; }
+html.ux #savedState { color: var(--ink-3) !important; font-family: var(--font-mono); font-size: var(--fs-label) !important; letter-spacing: .04em; }
+
+html.ux .reference-section { margin-top: var(--s-3); padding-top: var(--s-3); border-top: 1px solid var(--line); }
+html.ux .reference-section h4,
+html.ux .touch-label-section h4 {
+  margin: 0 0 var(--s-2) !important;
+  font-size: var(--fs-label) !important;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-4) !important;
+}
+html.ux #referenceStatus { font-size: var(--fs-12) !important; color: var(--ink-3) !important; }
+html.ux .reference-values { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--s-2) 0; }
+html.ux .reference-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* --- 阶段 02 的过程条（exhibition.js 运行时插入） --- */
+html.ux #learningProcess { padding: var(--s-3) var(--s-4) 0 !important; }
+html.ux .process-steps { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-bottom: var(--s-2); }
+html.ux .process-steps span {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 8px !important;
+  border-radius: var(--r-sm) !important;
+  background: var(--panel-glass) !important;
+  border: 1px solid var(--line) !important;
+  color: var(--ink-4) !important;
+  font-size: var(--fs-label) !important;
+  font-weight: 650;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+html.ux .process-steps span.complete { border-color: rgba(70, 226, 166, .34) !important; background: var(--brand-soft) !important; color: var(--brand) !important; }
+html.ux .process-steps svg { width: 12px !important; height: 12px !important; }
+html.ux .process-readout {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 24px;
+  font-size: var(--fs-12) !important;
+  color: var(--ink-3) !important;
+}
+html.ux .process-readout strong { color: var(--ink) !important; font-family: var(--font-mono); font-size: var(--fs-12) !important; }
+html.ux .process-readout .quiet-button { min-height: 28px !important; height: 28px; padding: 0 8px !important; font-size: var(--fs-label) !important; }
+
+/* ---------------------------------------------------------------------------
+   6. 阶段 02：观察训练 —— 神经网络是主角，字号与留白都给它
+   --------------------------------------------------------------------------- */
+html.ux .train-stage {
+  background:
+    radial-gradient(560px 300px at 50% 0%, rgba(70, 226, 166, .09), transparent 70%),
+    linear-gradient(180deg, var(--panel-2), var(--panel)) !important;
+  border-color: rgba(70, 226, 166, .16) !important;
+}
+
+html.ux .learning-phases {
+  display: flex !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: var(--s-3) var(--s-4) 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+html.ux .learning-phases span {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 30px;
+  padding: 0 8px;
+  border-radius: var(--r-pill) !important;
+  background: transparent !important;
+  border: 1px solid var(--line) !important;
+  color: var(--ink-4) !important;
+  font-size: var(--fs-label) !important;
+  font-weight: 650;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+html.ux .learning-phases small { font-size: var(--fs-label) !important; color: inherit !important; opacity: .8; }
+html.ux .learning-phases span.active {
+  background: var(--brand-soft) !important;
+  border-color: rgba(70, 226, 166, .38) !important;
+  color: var(--brand) !important;
+}
+html.ux .learning-phases span.active small { color: var(--brand) !important; opacity: .85; }
+html.ux .learning-phases svg { width: 12px !important; height: 12px !important; }
+
+html.ux .training-summary { display: flex; align-items: baseline; gap: 8px; margin: var(--s-3) 0 var(--s-2) !important; padding: 0 !important; }
+html.ux #trainTitle {
+  margin: 0 !important;
+  font-size: var(--fs-13) !important;
+  font-weight: 600 !important;
+  color: var(--ink-2) !important;
+  letter-spacing: .01em;
+}
+html.ux #epochCount { font-family: var(--font-mono); font-size: var(--fs-label) !important; color: var(--ink-4) !important; letter-spacing: .06em; }
+
+html.ux .learning-sample {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-2) !important;
+  padding: 6px !important;
+  border-radius: var(--r-md) !important;
+  background: var(--panel-glass) !important;
+  border: 1px solid var(--line) !important;
+}
+html.ux .learning-sample img,
+html.ux .sample-fallback {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: var(--r-sm) !important;
+  object-fit: cover;
+  flex: none;
+}
+html.ux .sample-fallback { display: grid; place-items: center; background: rgba(255, 255, 255, .05) !important; color: var(--ink-4) !important; }
+html.ux .sample-labels { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
+html.ux .sample-labels select { min-height: 32px !important; height: 32px; font-size: var(--fs-12); padding: 0 26px 0 8px; background-position: right 8px center; }
+html.ux .sample-labels strong { font-size: var(--fs-12) !important; font-weight: 650; color: var(--ink) !important; }
+
+html.ux .prediction-change { display: flex; align-items: center; gap: 6px; margin-left: auto; font-size: var(--fs-12) !important; color: var(--ink-4) !important; }
+html.ux .prediction-change span { font-size: var(--fs-12) !important; color: var(--ink-4) !important; }
+html.ux .prediction-change strong { font-family: var(--font-mono); font-size: var(--fs-12) !important; color: var(--ink-2) !important; font-weight: 700; }
+html.ux .prediction-change strong.wrong { color: var(--danger) !important; }
+html.ux .prediction-change svg { width: 13px !important; height: 13px !important; }
+
+/* 神经网络画布：中央主角，加深色网格底与轻微内发光 */
+html.ux .network-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 220px !important;
+  margin: 0 0 var(--s-2) !important;
+  padding: 0 !important;
+  border-radius: var(--r-md) !important;
+  border: 1px solid var(--line) !important;
+  background:
+    radial-gradient(420px 220px at 50% 40%, rgba(70, 226, 166, .10), transparent 72%),
+    linear-gradient(180deg, rgba(255, 255, 255, .02), transparent),
+    #08110e !important;
+  box-shadow: 0 0 60px -30px rgba(70, 226, 166, .5) inset !important;
+  overflow: hidden;
+}
+html.ux #networkCanvas { width: 100% !important; height: 100% !important; display: block; }
+html.ux .network-legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 24px;
+  font-size: var(--fs-label) !important;
+  color: var(--ink-4) !important;
+  letter-spacing: .02em;
+}
+html.ux .network-legend span { font-size: var(--fs-label) !important; color: var(--ink-4) !important; }
+html.ux .network-legend span:last-child { margin-left: auto; }
+html.ux .network-legend b {
+  display: inline-block;
+  width: 14px !important;
+  height: 3px !important;
+  border-radius: var(--r-pill) !important;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+html.ux .positive-key { background: var(--brand) !important; }
+html.ux .negative-key { background: rgba(255, 255, 255, .22) !important; }
+
+html.ux .learning-measures { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: var(--s-2) 0 !important; padding: 0 !important; }
+html.ux .learning-measures div {
+  padding: 8px 10px !important;
+  border-radius: var(--r-sm) !important;
+  background: var(--panel-glass) !important;
+  border: 1px solid var(--line) !important;
+}
+html.ux .learning-measures div span { font-size: var(--fs-label) !important; color: var(--ink-4) !important; letter-spacing: .06em; }
+html.ux .learning-measures strong {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono) !important;
+  font-size: 22px !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+html.ux .learning-measures .badge { margin-top: 2px; }
+
+/* 训练控制条 */
+html.ux .lesson-controls {
+  display: flex !important;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  margin: 0 0 var(--s-2) !important;
+  padding: 0 !important;
+}
+html.ux .pace-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-label) !important;
+  color: var(--ink-4) !important;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+html.ux .pace-label select { min-height: 32px !important; height: 32px; font-size: var(--fs-12); padding: 0 26px 0 8px; background-position: right 8px center; }
+html.ux .round-tools { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+html.ux .round-tools .divider { width: 1px; height: 18px; background: var(--line-2) !important; }
+
+html.ux .history-control,
+html.ux .light-control { display: flex; align-items: center; gap: 8px; min-height: 32px; }
+html.ux .history-control span { font-size: var(--fs-label) !important; color: var(--ink-4) !important; font-family: var(--font-mono); }
+html.ux .light-control svg { width: 15px !important; height: 15px !important; color: var(--ink-4) !important; }
+
+html.ux .history-control input[type=range],
+html.ux .light-control input[type=range],
+html.ux input#trainingHistory,
+html.ux input#light {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 24px !important;
+  min-height: 24px !important;
+  background: transparent !important;
+  cursor: pointer;
+}
+html.ux .history-control input[type=range]::-webkit-slider-runnable-track,
+html.ux .light-control input[type=range]::-webkit-slider-runnable-track,
+html.ux input#trainingHistory::-webkit-slider-runnable-track,
+html.ux input#light::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, .14);
+}
+html.ux .history-control input[type=range]::-webkit-slider-thumb,
+html.ux .light-control input[type=range]::-webkit-slider-thumb,
+html.ux input#trainingHistory::-webkit-slider-thumb,
+html.ux input#light::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--brand);
+  border: 2px solid #08110e;
+  box-shadow: 0 0 0 3px rgba(70, 226, 166, .18);
+}
+html.ux .history-control input[type=range]:disabled::-webkit-slider-thumb { background: var(--ink-4); box-shadow: none; }
+
+/* 训练误差曲线：深底网格 */
+html.ux .chart-wrap {
+  position: relative;
+  height: 108px !important;
+  margin: 0 0 var(--s-2) !important;
+  padding: 0 !important;
+  border-radius: var(--r-md) !important;
+  border: 1px solid var(--line) !important;
+  background:
+    linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px) 0 0 / 100% 26px,
+    linear-gradient(90deg, rgba(255, 255, 255, .04) 1px, transparent 1px) 0 0 / 52px 100%,
+    #08110e !important;
+  overflow: hidden;
+}
+html.ux #chartEmpty { display: grid; place-items: center; height: 100%; gap: 4px; color: var(--ink-4) !important; font-size: var(--fs-label) !important; }
+html.ux #chartEmpty svg { width: 18px !important; height: 18px !important; opacity: .7; }
+html.ux .chart-caption { font-size: var(--fs-label) !important; color: var(--ink-4) !important; letter-spacing: .04em; }
+
+html.ux .metrics { display: flex !important; align-items: center; gap: var(--s-4); margin: var(--s-1) 0 var(--s-2) !important; padding: 0 !important; }
+html.ux .metrics div + div { padding-left: var(--s-4); border-left: 1px solid var(--line); }
+html.ux .metrics span { display: block; font-size: var(--fs-label) !important; color: var(--ink-4) !important; letter-spacing: .08em; text-transform: uppercase; }
+html.ux .metrics strong {
+  font-family: var(--font-mono) !important;
+  font-size: var(--fs-20) !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+html.ux .train-stage .primary-button { width: 100%; margin-top: auto !important; }
+html.ux .under-note { margin: var(--s-1) 0 0 !important; font-size: var(--fs-label) !important; color: var(--ink-4) !important; text-align: center; }
+/* ---------------------------------------------------------------------------
+   7. 阶段 03：推理台 —— 取景器是第二个主角，结果用仪表读数呈现
+   --------------------------------------------------------------------------- */
+html.ux .viewfinder {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  margin: 0 0 var(--s-2) !important;
+  border-radius: var(--r-md) !important;
+  border: 1px solid var(--line-2) !important;
+  background: #050b09 !important;
+  overflow: hidden;
+  box-shadow: 0 0 40px -24px rgba(99, 169, 255, .6) inset !important;
+}
+html.ux .viewfinder img, html.ux .viewfinder video, html.ux #cameraStream { width: 100%; height: 100%; object-fit: cover; }
+html.ux .roi-frame { border-color: rgba(70, 226, 166, .8) !important; box-shadow: 0 0 0 9999px rgba(3, 8, 6, .34); }
+html.ux .roi-frame span {
+  background: var(--brand) !important;
+  color: var(--brand-ink) !important;
+  font-size: 10px !important;
+  font-weight: 700;
+  letter-spacing: .08em;
+  border-radius: 0 0 4px 0 !important;
+  padding: 2px 6px !important;
+}
+html.ux .view-tools {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  gap: 4px;
+  padding: 3px !important;
+  border-radius: var(--r-md) !important;
+  background: rgba(5, 11, 9, .72) !important;
+  border: 1px solid rgba(255, 255, 255, .14) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: none !important;
+}
+html.ux .view-tools .icon-button { width: 38px !important; height: 38px !important; min-height: 38px !important; color: var(--ink-2) !important; border-radius: var(--r-sm) !important; }
+html.ux .view-tools .icon-button svg { width: 16px !important; height: 16px !important; }
+html.ux .view-tools .icon-button:hover,
+html.ux .view-tools .icon-button[aria-pressed=true] { background: rgba(70, 226, 166, .2) !important; color: var(--brand) !important; }
+
+html.ux #cameraOverlay { background: rgba(4, 9, 7, .72) !important; }
+html.ux #cameraOverlay > svg { width: 26px !important; height: 26px !important; color: var(--ink-4) !important; }
+html.ux #cameraMessage { font-size: var(--fs-12) !important; color: var(--ink-3) !important; }
+html.ux .camera-button {
+  min-height: 40px !important;
+  border-radius: var(--r-md) !important;
+  background: rgba(5, 11, 9, .8) !important;
+  border: 1px solid rgba(255, 255, 255, .18) !important;
+  color: var(--ink) !important;
+  font-size: var(--fs-12) !important;
+}
+html.ux .live-badge {
+  border-radius: var(--r-pill) !important;
+  background: rgba(255, 125, 110, .18) !important;
+  border: 1px solid rgba(255, 125, 110, .4) !important;
+  color: var(--danger) !important;
+  font-size: 10px !important;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+html.ux .camera-controls,
+html.ux .sim-controls { display: flex !important; align-items: center; gap: 6px; margin: 0 0 var(--s-2) !important; padding: 0 !important; flex-wrap: nowrap; }
+html.ux .camera-controls select, html.ux .scale-control select { min-height: 32px !important; height: 32px; font-size: var(--fs-12); padding: 0 26px 0 8px; background-position: right 8px center; }
+
+/* 色卡：三类样本的取样点 */
+html.ux .swatches { display: flex !important; align-items: center; gap: 5px; margin: 0 0 var(--s-2) !important; padding: 0 !important; }
+html.ux .swatches button {
+  width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  border-radius: var(--r-sm) !important;
+  border: 1px solid rgba(255, 255, 255, .18) !important;
+  background: var(--panel-glass) !important;
+  box-shadow: none !important;
+}
+html.ux .swatches button[aria-pressed=true] { border-color: var(--brand) !important; box-shadow: 0 0 0 2px rgba(70, 226, 166, .28) !important; }
+html.ux .swatches button.empty-swatch { border-style: dashed !important; color: var(--ink-4) !important; }
+html.ux .swatches button.empty-swatch svg { width: 14px !important; height: 14px !important; }
+
+html.ux .light-control { margin: 0 0 var(--s-2) !important; }
+html.ux .light-control input { flex: 1 1 auto; }
+
+/* 读数：标签 + 大号百分比，加三条概率条 */
+html.ux .prediction {
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 2px var(--s-2);
+  margin: var(--s-3) 0 var(--s-2) !important;
+  padding: var(--s-3) 0 0 !important;
+  border-top: 1px solid var(--line);
+}
+html.ux #predictionLabel {
+  font-size: var(--fs-13) !important;
+  font-weight: 650 !important;
+  color: var(--ink-2) !important;
+  letter-spacing: .02em;
+}
+html.ux #predictionScore {
+  grid-row: span 2;
+  font-family: var(--font-mono) !important;
+  font-size: var(--fs-34) !important;
+  font-weight: 500 !important;
+  line-height: 1;
+  color: var(--brand) !important;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+html.ux #predictionScore.wrong { color: var(--danger) !important; }
+
+html.ux #scoreBars { display: flex; flex-direction: column; gap: 7px; margin: 0 0 var(--s-2) !important; padding: 0 !important; }
+html.ux .score-row { display: grid !important; grid-template-columns: 44px 1fr 42px; align-items: center; gap: 8px; font-size: var(--fs-12) !important; }
+html.ux .score-name { font-size: var(--fs-12) !important; font-weight: 600; color: var(--ink-2) !important; white-space: nowrap; }
+html.ux .score-track { height: 6px !important; border-radius: var(--r-pill) !important; background: rgba(255, 255, 255, .08) !important; overflow: hidden; }
+html.ux .score-fill { height: 100% !important; border-radius: var(--r-pill) !important; background: var(--brand) !important; transition: width .3s ease; }
+html.ux .score-row:nth-child(1) .score-fill { background: var(--c-red) !important; }
+html.ux .score-row:nth-child(2) .score-fill { background: var(--c-amber) !important; }
+html.ux .score-row:nth-child(3) .score-fill { background: var(--c-blue) !important; }
+html.ux .score-number { font-family: var(--font-mono); font-size: var(--fs-label) !important; color: var(--ink-3) !important; text-align: right; font-variant-numeric: tabular-nums; }
+
+html.ux .inference-footer { display: flex !important; align-items: center; gap: 6px; margin: 0 0 var(--s-2) !important; padding: 0 !important; }
+html.ux .touch-label-section { margin-top: var(--s-2); padding-top: var(--s-3); border-top: 1px solid var(--line); }
+html.ux .touch-labels { display: flex !important; gap: 5px; flex-wrap: wrap; margin: 0 0 var(--s-2) !important; }
+html.ux .touch-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 34px; padding: 0 10px;
+  border-radius: var(--r-pill) !important;
+  border: 1px solid var(--line-2) !important;
+  background: transparent !important;
+  color: var(--ink-2) !important;
+  font-size: var(--fs-12) !important;
+  font-weight: 600;
+}
+html.ux .touch-label:hover { border-color: var(--line-3) !important; color: var(--ink) !important; background: var(--panel-glass) !important; }
+html.ux .label-dot { width: 8px !important; height: 8px !important; border-radius: 50% !important; }
+html.ux .receipt { font-size: var(--fs-12) !important; color: var(--ink-4) !important; line-height: 1.6; }
+html.ux .infer-stage .primary-button { width: 100%; margin-top: auto !important; }
+html.ux #challenge { width: 100%; }
+
+/* ---------------------------------------------------------------------------
+   8. 04/05 变成浮层舞台：默认不占位，点进度轨才展开；Esc 或关闭按钮退出
+   --------------------------------------------------------------------------- */
+html.ux .concept-section,
+html.ux .outcome-section { display: none !important; }
+
+html.ux .ux-overlay .concept-section,
+html.ux .ux-overlay .outcome-section {
+  display: block !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 90 !important;
+  margin: 0 !important;
+  padding: var(--s-5) clamp(20px, 3vw, 44px) var(--s-6) !important;
+  overflow: auto !important;
+  background: var(--bg) !important;
+  border: 0 !important;
+  border-top: 1px solid var(--line) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  animation: ux-rise .22s ease both;
+}
+html.ux .ux-overlay .outcome-section { animation-delay: .02s; }
+
+@keyframes ux-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+html.ux .concept-heading,
+html.ux .outcome-heading {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+  margin: 0 auto var(--s-4) !important;
+  padding: 0 !important;
+  max-width: 1360px;
+  border: 0 !important;
+}
+html.ux .concept-heading h3,
+html.ux .outcome-heading h3 {
+  margin: 0 !important;
+  font-size: var(--fs-26) !important;
+  font-weight: 620 !important;
+  letter-spacing: -0.02em;
+  color: var(--ink) !important;
+}
+html.ux .concept-heading .eyebrow,
+html.ux .outcome-heading .eyebrow { color: var(--brand) !important; }
+html.ux .concept-tools { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+
+html.ux .purpose-card {
+  max-width: 1360px;
+  margin: 0 auto var(--s-4) !important;
+  padding: var(--s-3) var(--s-4) !important;
+  border-radius: var(--r-md) !important;
+  border: 1px solid var(--line) !important;
+  border-left: 2px solid var(--brand) !important;
+  background: var(--panel) !important;
+}
+html.ux .purpose-q { display: flex; align-items: center; gap: 8px; font-size: var(--fs-12) !important; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2) !important; }
+html.ux .purpose-q svg { width: 14px !important; height: 14px !important; color: var(--brand) !important; }
+html.ux .purpose-card p { margin: 6px 0 0 !important; font-size: var(--fs-13) !important; line-height: 1.65; color: var(--ink-3) !important; }
+html.ux .purpose-card strong { color: var(--ink) !important; font-weight: 650; }
+
+html.ux .concept-body {
+  display: grid !important;
+  grid-template-columns: minmax(360px, 1fr) minmax(420px, 1.1fr) !important;
+  gap: var(--s-4) !important;
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+html.ux .wheel-panel,
+html.ux .definition-panel {
+  padding: var(--s-4) !important;
+  border-radius: var(--r-lg) !important;
+  border: 1px solid var(--line) !important;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel)) !important;
+  box-shadow: var(--shadow-1) !important;
+}
+html.ux .wheel-wrap { position: relative; display: grid; place-items: center; min-height: 260px; }
+html.ux #wheelBig, html.ux #wheelSmall { filter: saturate(1.05) contrast(1.02); }
+html.ux .wheel-center { color: var(--ink) !important; }
+html.ux .concept-bases { display: flex; align-items: center; gap: 8px; margin-top: var(--s-2); }
+html.ux .wheel-step { display: inline-flex; gap: 4px; margin-left: auto; }
+html.ux .wheel-step .icon-button { width: 36px !important; height: 36px !important; min-height: 36px !important; }
+html.ux .base-note { font-size: var(--fs-12) !important; color: var(--ink-4) !important; }
+html.ux .wheel-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: var(--s-3); font-size: var(--fs-label) !important; color: var(--ink-3) !important; }
+html.ux .wheel-legend span { font-size: var(--fs-label) !important; color: var(--ink-3) !important; }
+html.ux .wheel-legend b { display: inline-block; width: 8px !important; height: 8px !important; border-radius: 50% !important; margin-right: 4px; }
+html.ux .wheel-tip { margin-top: var(--s-3); padding: var(--s-2) var(--s-3); border-radius: var(--r-sm); background: var(--panel-glass); font-size: var(--fs-12) !important; color: var(--ink-3) !important; }
+
+html.ux .definition-cards { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s-2); }
+html.ux .definition-cards > * {
+  padding: var(--s-3) !important;
+  border-radius: var(--r-md) !important;
+  border: 1px solid var(--line) !important;
+  background: var(--panel-glass) !important;
+}
+html.ux .definition-cards strong { font-size: var(--fs-13) !important; font-weight: 650; color: var(--ink) !important; }
+html.ux .definition-cards .badge { margin-left: 6px; }
+html.ux .tone-map { margin-top: var(--s-4); }
+html.ux .tone-map-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: var(--s-2); }
+html.ux .tone-map-head span { font-size: var(--fs-13) !important; font-weight: 650; color: var(--ink-2) !important; }
+html.ux .tone-map-head small { font-size: var(--fs-label) !important; color: var(--ink-4) !important; }
+html.ux .tone-grid { display: grid !important; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+html.ux .tone-grid > * { height: 26px !important; border-radius: 4px !important; border: 1px solid rgba(255, 255, 255, .1) !important; }
+html.ux .tone-row { display: flex; align-items: center; gap: 6px; }
+html.ux .tone-row button { width: 34px !important; height: 34px !important; min-height: 34px !important; padding: 0 !important; border-radius: var(--r-sm) !important; }
+html.ux .neutral-row { display: flex; align-items: center; gap: 8px; margin-top: var(--s-2); font-size: var(--fs-12) !important; color: var(--ink-3) !important; }
+html.ux .neutral-chip { padding: 3px 8px !important; border-radius: var(--r-pill) !important; background: var(--panel-glass) !important; border: 1px solid var(--line) !important; }
+html.ux .neutral-chip span b, html.ux .neutral-title { color: var(--ink-2) !important; }
+html.ux .neutral-title { font-size: var(--fs-12) !important; }
+html.ux .def-share { font-size: var(--fs-12) !important; color: var(--ink-3) !important; }
+html.ux .def-share b { font-family: var(--font-mono); font-size: var(--fs-12) !important; color: var(--ink) !important; font-weight: 700; }
+html.ux .taught-swatch .taught-text, html.ux .check-fit .short, html.ux .check-probe .short { font-size: var(--fs-12) !important; color: var(--ink-3) !important; }
+html.ux .taught-swatch i, html.ux .hue-band { border-radius: 4px !important; }
+html.ux li.check-fit, html.ux li.check-probe {
+  border-radius: var(--r-sm) !important;
+  background: var(--panel-glass) !important;
+  border: 1px solid var(--line) !important;
+  color: var(--ink-2) !important;
+  font-size: var(--fs-12) !important;
+}
+html.ux li.check-fit.ok, html.ux li.check-probe.ok { border-color: rgba(79, 224, 160, .3) !important; }
+
+html.ux .insight-strip { display: flex; flex-direction: column; gap: 6px; margin-top: var(--s-4) !important; }
+html.ux .insight {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 8px;
+  padding: var(--s-3) !important;
+  border-radius: var(--r-md) !important;
+  border: 1px solid var(--line) !important;
+  background: var(--panel-glass) !important;
+  color: var(--ink-2) !important;
+  font-size: var(--fs-13) !important;
+  line-height: 1.6;
+}
+html.ux .insight svg { width: 15px !important; height: 15px !important; flex: none; margin-top: 2px; color: var(--brand) !important; }
+html.ux .insight p, html.ux .insight div, html.ux .insight span { font-size: var(--fs-13) !important; color: var(--ink-2) !important; margin: 0 !important; }
+html.ux .insight strong { color: var(--ink) !important; font-weight: 650; }
+html.ux .insight.placeholder { color: var(--ink-4) !important; border-style: dashed !important; }
+html.ux .insight.next { background: rgba(70, 226, 166, .10) !important; border-color: rgba(70, 226, 166, .28) !important; }
+html.ux .insight.next strong { color: var(--brand) !important; }
+html.ux .compare-strip { display: flex; gap: 8px; flex-wrap: wrap; margin-top: var(--s-3); font-size: var(--fs-12) !important; color: var(--ink-3) !important; }
+html.ux #colorExperiment { border: 0 !important; background: transparent !important; margin-top: var(--s-4) !important; }
+html.ux #colorExperiment > summary {
+  display: flex; align-items: center; gap: 8px;
+  min-height: 44px;
+  padding: 0 12px !important;
+  border-radius: var(--r-md) !important;
+  border: 1px solid var(--line) !important;
+  background: var(--panel) !important;
+  color: var(--ink-2) !important;
+  font-size: var(--fs-13) !important;
+  font-weight: 650;
+  cursor: pointer;
+  list-style: none;
+}
+html.ux #colorExperiment > summary::-webkit-details-marker { display: none; }
+html.ux #colorExperiment > summary::before { content: "+"; font-family: var(--font-mono); color: var(--brand); font-size: 14px; }
+html.ux #colorExperiment[open] > summary::before { content: "–"; }
+html.ux #probeRegionWarning { margin-top: var(--s-2) !important; font-size: var(--fs-12) !important; color: var(--warn) !important; }
+html.ux #learnCorrection { font-size: var(--fs-12) !important; color: var(--ink-2) !important; }
+
+/* 样本学习结果卡（exhibition.js 插入） */
+html.ux .sample-learning-result {
+  margin-top: var(--s-4) !important;
+  padding: var(--s-4) !important;
+  border-radius: var(--r-lg) !important;
+  border: 1px solid var(--line) !important;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel)) !important;
+}
+html.ux .sample-result-heading { display: flex; align-items: baseline; gap: 8px; margin-bottom: var(--s-3) !important; }
+html.ux .sample-result-heading span { font-size: var(--fs-label) !important; color: var(--ink-4) !important; letter-spacing: .12em; text-transform: uppercase; }
+html.ux .sample-result-heading strong { font-size: var(--fs-16) !important; font-weight: 650; color: var(--ink) !important; }
+html.ux #sampleLearningCards { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--s-2) !important; }
+html.ux .sample-learning-card {
+  padding: var(--s-3) !important;
+  border-radius: var(--r-md) !important;
+  border: 1px solid var(--line) !important;
+  background: var(--panel-glass) !important;
+}
+html.ux .sample-learning-card img { width: 100%; height: 84px !important; object-fit: cover; border-radius: var(--r-sm) !important; margin-bottom: 8px; }
+html.ux .sample-learning-card strong { font-size: var(--fs-13) !important; font-weight: 650; color: var(--ink) !important; }
+html.ux .sample-learning-card > span { font-size: var(--fs-12) !important; color: var(--ink-3) !important; }
+html.ux .sample-learning-card div { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: var(--fs-12) !important; color: var(--ink-4) !important; }
+html.ux .sample-learning-card div b { font-family: var(--font-mono); color: var(--brand) !important; font-weight: 700; }
+html.ux #sampleResultNote { font-size: var(--fs-12) !important; color: var(--ink-3) !important; margin-top: var(--s-3) !important; }
+
+/* 05 检验 */
+html.ux .outcome-content {
+  display: grid !important;
+  grid-template-columns: 260px 1fr minmax(280px, 1fr) !important;
+  gap: var(--s-4) !important;
+  max-width: 1360px;
+  margin: 0 auto;
+  align-items: start;
+}
+html.ux .outcome-score {
+  padding: var(--s-4) !important;
+  border-radius: var(--r-lg) !important;
+  border: 1px solid var(--line) !important;
+  background: linear-gradient(180deg, var(--panel-2), var(--panel)) !important;
+  text-align: center;
+}
+html.ux .outcome-score strong {
+  display: block;
+  font-family: var(--font-mono) !important;
+  font-size: var(--fs-44) !important;
+  font-weight: 500 !important;
+  line-height: 1;
+  color: var(--info) !important;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+html.ux .outcome-score span { font-size: var(--fs-12) !important; color: var(--ink-4) !important; letter-spacing: .08em; text-transform: uppercase; }
+html.ux .category-results { display: flex !important; flex-direction: column; gap: 6px; }
+html.ux .category-results div {
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  padding: var(--s-3) !important;
+  border-radius: var(--r-md) !important;
+  border: 1px solid var(--line) !important;
+  background: var(--panel-glass) !important;
+}
+html.ux .category-results span { font-size: var(--fs-12) !important; color: var(--ink-4) !important; }
+html.ux .category-results strong { font-family: var(--font-mono); font-size: var(--fs-20) !important; color: var(--ink) !important; font-weight: 600; grid-row: span 2; align-self: center; }
+html.ux #outcomeMeaning { font-size: var(--fs-13) !important; line-height: 1.7; color: var(--ink-2) !important; }
+html.ux .exam-latest { display: flex; align-items: center; gap: var(--s-3); margin-top: var(--s-2); }
+html.ux .exam-latest img { width: 96px; height: 72px; object-fit: cover; border-radius: var(--r-sm); border: 1px solid var(--line-2); }
+html.ux .exam-latest div { font-size: var(--fs-12) !important; color: var(--ink-3) !important; }
+html.ux .confusion-wrap { margin-top: var(--s-3); }
+html.ux #confusion { border-collapse: separate; border-spacing: 3px; font-size: var(--fs-12); }
+html.ux #confusion caption { font-size: var(--fs-label) !important; color: var(--ink-4) !important; text-align: left; padding-bottom: 6px; letter-spacing: .1em; text-transform: uppercase; }
+html.ux #confusion th, html.ux #confusion td {
+  padding: 6px 10px !important;
+  border: 0 !important;
+  border-radius: var(--r-sm) !important;
+  background: var(--panel-glass) !important;
+  color: var(--ink-2) !important;
+  font-family: var(--font-mono) !important;
+  font-size: var(--fs-12) !important;
+  text-align: center;
+}
+html.ux #confusion th { color: var(--ink-3) !important; font-weight: 650; background: transparent !important; }
+html.ux #confusion .matrix-correct { background: rgba(70, 226, 166, .16) !important; color: var(--brand) !important; font-weight: 700; }
+
+/* ---------------------------------------------------------------------------
+   9. 训练聚焦态：只留主舞台，其余压暗（原版 #trainingFocus 的行为）
+   --------------------------------------------------------------------------- */
+html.ux .training-focus main { max-width: none !important; }
+html.ux .training-focus .workspace { grid-template-columns: 1fr !important; }
+html.ux .training-focus .data-stage,
+html.ux .training-focus .infer-stage { display: none !important; }
+html.ux .training-focus .train-stage { max-width: 1100px; margin: 0 auto; }
+html.ux .training-focus .network-wrap { min-height: min(52vh, 520px) !important; }
+html.ux .training-focus .train-stage .chart-wrap { height: 160px !important; }
+html.ux .training-focus .learning-measures strong,
+html.ux .training-focus .metrics strong { font-size: 30px !important; }
+html.ux body.is-training .train-stage { border-color: rgba(70, 226, 166, .34) !important; box-shadow: 0 0 0 1px rgba(70, 226, 166, .18), 0 30px 80px -44px var(--brand-glow) !important; }
+
+/* ---------------------------------------------------------------------------
+   10. 底部：设备连接与状态条，一行细字
+   --------------------------------------------------------------------------- */
+html.ux .android-connection {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--ink-4) !important;
+  font-size: var(--fs-12) !important;
+}
+html.ux #connectionState { font-size: var(--fs-label) !important; color: var(--ink-4) !important; }
+
+html.ux .statusbar {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  height: var(--status-h) !important;
+  min-height: var(--status-h) !important;
+  padding: 0 clamp(16px, 2vw, 28px) !important;
+  border-top: 1px solid var(--line) !important;
+  background: rgba(8, 16, 13, .86) !important;
+  color: var(--ink-4) !important;
+  font-size: var(--fs-label) !important;
+  letter-spacing: .04em;
+}
+html.ux #statusText { font-size: var(--fs-label) !important; color: var(--ink-3) !important; }
+html.ux #clock { font-family: var(--font-mono); font-size: var(--fs-label) !important; color: var(--ink-4) !important; margin-left: auto; }
+
+/* ---------------------------------------------------------------------------
+   11. 弹窗与提示
+   --------------------------------------------------------------------------- */
+html.ux dialog {
+  width: min(520px, calc(100vw - 32px));
+  padding: var(--s-5) !important;
+  border-radius: var(--r-lg) !important;
+  border: 1px solid var(--line-2) !important;
+  background: var(--panel-2) !important;
+  color: var(--ink) !important;
+  box-shadow: var(--shadow-2) !important;
+}
+html.ux dialog::backdrop { background: rgba(2, 6, 5, .72); backdrop-filter: blur(6px); }
+html.ux dialog h2 { margin: 0 0 var(--s-2) !important; font-size: var(--fs-20) !important; font-weight: 650 !important; color: var(--ink) !important; }
+html.ux dialog p { margin: 0 0 var(--s-4) !important; font-size: var(--fs-13) !important; line-height: 1.65; color: var(--ink-3) !important; }
+html.ux dialog label { display: block; margin-bottom: 6px; font-size: var(--fs-label) !important; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-4) !important; }
+html.ux .dialog-heading { display: flex; align-items: center; gap: 8px; margin-bottom: var(--s-3); }
+html.ux .dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: var(--s-4); }
+html.ux #referencePreview, html.ux #challengeImage { border-radius: var(--r-md) !important; border: 1px solid var(--line) !important; max-width: 100%; }
+html.ux #androidLinks a { color: var(--brand) !important; font-size: var(--fs-12) !important; }
+
+html.ux #toast {
+  border-radius: var(--r-pill) !important;
+  background: var(--panel-3) !important;
+  border: 1px solid var(--line-2) !important;
+  color: var(--ink) !important;
+  font-size: var(--fs-13) !important;
+  box-shadow: var(--shadow-2) !important;
+}
+
+/* 浮层关闭按钮：由 ux.js 注入 */
+html.ux .ux-overlay-close {
+  position: fixed;
+  top: 18px;
+  right: clamp(20px, 3vw, 44px);
+  z-index: 120;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  background: var(--panel-2);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: var(--shadow-2);
+}
+html.ux .ux-overlay-close:hover { background: var(--panel-3); border-color: var(--line-3); }
+/* ---------------------------------------------------------------------------
+   12. 响应式：桌面三栏一屏 → 窄桌面两栏 → 平板单栏 → 手机纵排
+   --------------------------------------------------------------------------- */
+@media (min-width: 1680px) {
+  html.ux .workspace { grid-template-columns: minmax(300px, .74fr) minmax(520px, 1.7fr) minmax(340px, .96fr) !important; }
+  html.ux .network-wrap { min-height: 300px !important; }
+}
+
+@media (max-width: 1280px) {
+  html.ux .mission { display: none !important; }
+  html.ux .workspace { grid-template-columns: minmax(244px, .74fr) minmax(380px, 1.6fr) minmax(272px, .9fr) !important; }
+  html.ux .learning-measures strong { font-size: 20px !important; }
+  html.ux #predictionScore { font-size: 28px !important; }
+}
+
+/* 1100 以下：放弃"强制一屏"，改成垂直流动，让每栏拿到舒服的宽度 */
+@media (max-width: 1100px) {
+  html.ux body {
+    display: block !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow: auto !important;
+  }
+  html.ux main { display: block !important; overflow: visible; padding: 0 clamp(14px, 3vw, 22px) !important; }
+  html.ux .sessionbar { flex-wrap: wrap; gap: var(--s-3); padding: var(--s-2) 0 !important; }
+  html.ux .journey { max-width: none; order: 3; flex-basis: 100%; }
+  html.ux .session-controls { order: 2; }
+  html.ux .workspace {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    height: auto !important;
+    padding: var(--s-3) 0 var(--s-5) !important;
+    overflow: visible !important;
+  }
+  html.ux .stage {
+    max-height: none !important;
+    overflow: visible !important;
+    border-radius: var(--r-lg) !important;
+  }
+  html.ux .stage + .stage { border-left: 1px solid var(--line) !important; }
+  html.ux .stage-heading { position: static; }
+  html.ux .network-wrap { min-height: 320px !important; }
+  html.ux .train-stage .primary-button { margin-top: var(--s-2) !important; }
+  html.ux .infer-stage .primary-button { margin-top: var(--s-2) !important; }
+  /* 窄屏时 04/05 回到正常文档流 */
+  html.ux .concept-section,
+  html.ux .outcome-section { display: block !important; margin-top: var(--s-4) !important; }
+  html.ux .concept-body,
+  html.ux .outcome-content { grid-template-columns: minmax(0, 1fr) !important; }
+  html.ux .ux-overlay .concept-section,
+  html.ux .ux-overlay .outcome-section { position: static !important; padding: 0 !important; }
+  html.ux .ux-overlay-close { display: none; }
+  html.ux .statusbar { height: auto !important; min-height: 40px !important; padding: 8px clamp(14px, 3vw, 22px) !important; flex-wrap: wrap; }
+}
+
+@media (max-width: 720px) {
+  html.ux .topbar { gap: var(--s-2); }
+  html.ux .brand-sub { display: none; }
+  html.ux .project-tools .quiet-button { padding: 0 8px !important; }
+  html.ux .project-tools .divider { display: none; }
+  html.ux .local-indicator { display: none !important; }
+  html.ux .session-controls { margin-left: 0; }
+  html.ux .journey { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+  html.ux .journey li { justify-content: center; padding: 0 4px !important; gap: 4px; }
+  html.ux .journey li span { display: none; }
+  html.ux .journey li b { width: 24px; height: 24px; font-size: 11px !important; }
+  html.ux .stage-heading { min-height: 52px !important; padding: 0 var(--s-3) !important; }
+  html.ux .stage-meta { font-size: 10px !important; letter-spacing: .06em; }
+  html.ux .stage > *:not(.stage-heading):not(.learning-phases):not(#learningProcess) { padding-left: var(--s-3) !important; padding-right: var(--s-3) !important; }
+  html.ux .learning-phases { padding: 10px var(--s-3) 0 !important; }
+  html.ux .learning-phases small { display: none; }
+  html.ux .process-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  html.ux .learning-measures { grid-template-columns: repeat(3, 1fr); gap: 3px; }
+  html.ux .learning-measures div { padding: 6px 8px !important; }
+  html.ux .learning-measures strong { font-size: 18px !important; }
+  html.ux .metrics { gap: var(--s-3); }
+  html.ux .metrics div + div { padding-left: var(--s-3); }
+  html.ux .thumbnails { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
+  html.ux .concept-heading h3, html.ux .outcome-heading h3 { font-size: var(--fs-20) !important; }
+  html.ux .tone-grid { grid-template-columns: repeat(8, 1fr); }
+  html.ux dialog { padding: var(--s-4) !important; }
+  html.ux .exam-latest { flex-direction: column; align-items: flex-start; }
+}
+
+/* ---------------------------------------------------------------------------
+   13. 动效与系统偏好
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html.ux *, html.ux *::before, html.ux *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  html.ux .ux-overlay .concept-section,
+  html.ux .ux-overlay .outcome-section { animation: none !important; }
+}
+
+@media (prefers-contrast: more) {
+  html.ux { --ink-3: #b6c8bf; --ink-4: #a3b5ac; --line-2: rgba(255, 255, 255, .28); --line-3: rgba(120, 255, 205, .5); }
+  html.ux .stage, html.ux .class-record { border-color: var(--line-2) !important; }
+  html.ux button { border-color: var(--line-2) !important; }
+}
+
+@media print {
+  html.ux body { display: block !important; height: auto !important; overflow: visible !important; background: #fff !important; color: #111 !important; }
+  html.ux .topbar, html.ux .sessionbar, html.ux .statusbar, html.ux .android-connection, html.ux .project-tools { display: none !important; }
+  html.ux .stage { break-inside: avoid; border: 1px solid #ccc !important; background: #fff !important; color: #111 !important; max-height: none !important; }
+  html.ux .concept-section, html.ux .outcome-section { display: block !important; position: static !important; }
+}
+/* ---------------------------------------------------------------------------
+   14. 骨架修正：把元素钉在明确的行/列上
+   原版 CSS 用了 auto-placement，body/main 里的额外节点（安卓连接、浮层、
+   toast 等）会被自动排到第 2 列，导致整张工作台被压成几十像素宽。
+   这里给每个区域显式指定行列，只有一列。
+   --------------------------------------------------------------------------- */
+html.ux body { grid-template-columns: minmax(0, 1fr) !important; grid-auto-flow: row; }
+html.ux body > .topbar { grid-column: 1; grid-row: 1; }
+html.ux body > main { grid-column: 1; grid-row: 2; }
+html.ux body > .statusbar { grid-column: 1; grid-row: 4; }
+html.ux .android-connection { display: none !important; }
+
+html.ux main {
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  grid-auto-flow: row;
+}
+html.ux main > .sessionbar { grid-column: 1; grid-row: 1; }
+html.ux main > .workspace { grid-column: 1; grid-row: 2; }
+html.ux main > #touchViews { display: none !important; }
+
+/* 04/05 在浮层里，不参与主网格 */
+html.ux main > .concept-section,
+html.ux main > .outcome-section { grid-column: 1; grid-row: 1 / -1; }
+
+html.ux #toast { position: fixed; z-index: 150; }
+html.ux #burst { position: fixed; inset: 0; pointer-events: none; z-index: 140; }
+
+@media (max-width: 1100px) {
+  html.ux body { display: block !important; }
+  html.ux body > main { grid-row: auto; }
+  html.ux main { display: block !important; }
+  html.ux main > #touchViews { display: flex !important; }
+}
+/* 三栏用命名区域定位（原版 .stage 就是 grid-area:data/train/infer）；
+   只改列宽不改区域名，会让三个面板掉到隐式轨道里被压成 2px。 */
+html.ux .workspace {
+  grid-template-areas: "data train infer" !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+}
+html.ux .training-focus .workspace { grid-template-areas: "train" !important; }
+/* ---------------------------------------------------------------------------
+   15. 收口：字号下限 12px + 触控热区 44px（用负外边距保证视觉尺寸不变）
+   原版 onescreen.css 用 body:not(...) 提高特异性钉死了不少 height/min-height，
+   这里是最后一层覆盖，只在 html.ux 生效。
+   --------------------------------------------------------------------------- */
+html.ux { --fs-label: 12px; }
+
+html.ux .stage-meta { font-size: 12px !important; letter-spacing: .08em; }
+html.ux .roi-frame span { font-size: 12px !important; padding: 2px 6px !important; }
+html.ux .live-badge { font-size: 12px !important; }
+html.ux .journey li b { font-size: 12px !important; }
+html.ux .journey li.done b { color: transparent !important; }
+html.ux .journey li.done b::after { font-size: 12px; color: var(--brand); }
+
+/* —— 热区：所有可点元素 ≥44×44 —— */
+html.ux .icon-button {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+}
+html.ux .topbar .icon-button,
+html.ux .topbar .quiet-button,
+html.ux .project-tools > .quiet-button,
+html.ux #reset {
+  min-height: 44px !important;
+  height: 44px !important;
+}
+html.ux .topbar .quiet-button { padding: 0 12px !important; }
+html.ux .skip-link { display: inline-flex; align-items: center; min-height: 44px; }
+
+html.ux .segmented button { min-height: 40px !important; height: 40px !important; padding: 0 12px !important; }
+html.ux .segmented { padding: 4px !important; }
+
+html.ux .delete-class {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  margin: -10px -8px -10px 0 !important;
+  border-radius: var(--r-sm) !important;
+}
+html.ux .delete-class svg { width: 15px !important; height: 15px !important; }
+
+html.ux .capture-button { min-height: 44px !important; height: 44px !important; }
+
+html.ux .view-tools .icon-button {
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+}
+html.ux .camera-button { min-height: 44px !important; height: 44px !important; }
+html.ux .camera-controls select,
+html.ux .sim-controls select,
+html.ux #trainingPace,
+html.ux #cameraSelect,
+html.ux .sample-labels select { min-height: 44px !important; height: 44px !important; }
+
+html.ux .swatches { gap: 2px !important; }
+html.ux .swatches button {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  margin: -5px 0 !important;
+  border-radius: var(--r-sm) !important;
+}
+html.ux .swatches button::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: inherit;
+}
+
+html.ux .touch-label {
+  min-height: 44px !important;
+  height: 44px !important;
+  padding: 0 12px !important;
+}
+html.ux .process-readout .quiet-button { min-height: 44px !important; height: 44px !important; margin: -10px 0 !important; }
+html.ux #transitionButton, html.ux .round-tools .quiet-button { min-height: 44px !important; height: 44px !important; }
+
+html.ux input#trainingHistory,
+html.ux input#light {
+  height: 44px !important;
+  min-height: 44px !important;
+  margin: -10px 0 !important;
+}
+html.ux label.history-control,
+html.ux label.light-control { min-height: 44px !important; }
+
+html.ux #train.primary-button { min-height: 48px !important; height: 48px !important; }
+html.ux #challenge { min-height: 48px !important; height: 48px !important; }
+html.ux #processShowResult { font-size: 12px !important; }
+
+/* —— 竖向预算：中间栏必须在一屏内放完，不留内部滚动 —— */
+html.ux main > .statusbar,
+html.ux .statusbar { grid-column: 1 !important; grid-row: 3 !important; }
+html.ux main {
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  row-gap: var(--s-3);
+  padding-bottom: var(--s-3) !important;
+}
+
+html.ux .journey { flex: 1 1 620px; min-width: 440px; }
+
+html.ux #learningProcess { padding: 10px var(--s-4) 0 !important; }
+html.ux .process-steps { gap: 3px !important; margin-bottom: 6px !important; }
+html.ux .process-steps span { padding: 5px 7px !important; font-size: 12px !important; }
+html.ux .process-readout { min-height: 26px; }
+
+html.ux .learning-phases { min-height: 30px !important; align-items: center; padding-top: 10px !important; }
+html.ux .learning-phases span { height: 28px !important; min-height: 28px !important; font-size: 12px !important; }
+html.ux .learning-phases small { font-size: 12px !important; }
+
+html.ux .training-summary { margin: 8px 0 6px !important; }
+html.ux .network-wrap { min-height: 168px !important; margin-bottom: 6px !important; }
+html.ux .network-legend { min-height: 18px !important; }
+html.ux .learning-measures { margin: 6px 0 !important; }
+html.ux .learning-measures div { padding: 7px 9px !important; }
+html.ux .learning-measures strong { font-size: 20px !important; }
+html.ux .lesson-controls { margin-bottom: 6px !important; }
+html.ux .history-control { min-height: 24px !important; }
+html.ux .chart-wrap { flex: none !important; height: 86px !important; margin-bottom: 6px !important; }
+html.ux .metrics { margin: 2px 0 6px !important; }
+html.ux .metrics strong { font-size: 18px !important; }
+html.ux .train-stage .primary-button { margin-top: 6px !important; }
+html.ux .under-note { margin: 2px 0 0 !important; font-size: 12px !important; }
+/* —— 16. 最后 6 个热区与 4 处小字 —— */
+html.ux .segmented { padding: 2px !important; }
+html.ux .segmented button { min-height: 44px !important; height: 44px !important; }
+html.ux .reference-actions .quiet-button { min-height: 44px !important; height: 44px !important; }
+html.ux .view-tools { padding: 2px !important; gap: 2px !important; }
+html.ux .view-tools .icon-button { width: 44px !important; min-width: 44px !important; height: 44px !important; min-height: 44px !important; }
+html.ux .light-control input,
+html.ux input#light { flex: 1 1 auto; min-width: 120px; }
+html.ux #referenceValues, html.ux .reference-values { font-size: 12px !important; }
+html.ux #inferenceStatus { font-size: 12px !important; }
+html.ux .journey li.done b { font-size: 12px !important; }
+
+/* —— 17. 中间栏竖向压缩：所有块之间的间距只剩 4px，靠亮度分组 —— */
+html.ux .train-stage > * + * { margin-top: 4px !important; }
+html.ux .train-stage > * { margin-bottom: 0 !important; }
+html.ux #learningProcess { padding: 8px var(--s-4) 0 !important; }
+html.ux .process-steps { margin-bottom: 4px !important; }
+html.ux .process-steps span { padding: 4px 6px !important; }
+html.ux .process-readout { min-height: 22px !important; }
+html.ux #processShowResult { height: 44px !important; min-height: 44px !important; margin: -11px 0 !important; }
+html.ux .learning-phases { min-height: 26px !important; padding-top: 8px !important; }
+html.ux .learning-phases span { height: 26px !important; min-height: 26px !important; }
+html.ux .network-wrap { min-height: 150px !important; }
+html.ux .network-legend { min-height: 16px !important; }
+html.ux .learning-measures div { padding: 6px 8px !important; }
+html.ux .learning-measures strong { font-size: 18px !important; }
+html.ux .learning-measures div span { letter-spacing: .02em; }
+html.ux .history-control { min-height: 22px !important; }
+html.ux .chart-wrap { height: 76px !important; }
+html.ux .metrics { margin: 0 !important; }
+html.ux .metrics strong { font-size: 18px !important; }
+html.ux .train-stage .primary-button { margin-top: 8px !important; }
+html.ux .train-stage .primary-button + .under-note { margin-top: 4px !important; }
+/* —— 18. 过程条单行（原版 4 枚胶囊在 408px 内换行，白吃 31px 高度） —— */
+html.ux .process-steps { flex-wrap: nowrap !important; gap: 2px !important; }
+html.ux .process-steps span {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  justify-content: center !important;
+  padding: 4px 2px !important;
+  white-space: nowrap !important;
+}
+html.ux .process-steps svg { flex: none; }
+html.ux .process-readout { margin-top: 6px !important; }
+html.ux .process-steps {
+  display: flex !important;
+  grid-template-columns: none !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 2px !important;
+}
+html.ux .process-steps span {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  height: 28px !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap !important;
+}
+/* —— 19. 两处实测不达标 —— */
+html.ux #referenceValues,
+html.ux .reference-values,
+html.ux .reference-section .reference-values { color: var(--ink-3) !important; }
+html.ux .journey li.done b { color: var(--brand) !important; position: relative; }
+html.ux .journey li.done b::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: inherit;
+  background: inherit;
+  color: var(--brand);
+  font-size: 12px;
+  line-height: 1;
+}
+/* —— 20. 04/05 在文档流里（≤1100）时也必须是深色面板 —— */
+html.ux .concept-section,
+html.ux .outcome-section.spotlight,
+html.ux .outcome-section {
+  background: var(--panel) !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-lg) !important;
+  padding: var(--s-5) !important;
+  margin: var(--s-4) 0 0 !important;
+  box-shadow: var(--shadow-1) !important;
+}
+html.ux .concept-section::before,
+html.ux .concept-section::after,
+html.ux .outcome-section::before,
+html.ux .outcome-section::after { display: none !important; }
+html.ux .concept-section .section-heading h3,
+html.ux .outcome-section .section-heading h3 { color: var(--ink) !important; }
+html.ux .definition-card,
+html.ux .wheel-panel,
+html.ux .definition-panel,
+html.ux .purpose-card,
+html.ux .sample-learning-card,
+html.ux .insight {
+  background: var(--panel-2) !important;
+  background-image: none !important;
+  border: 1px solid var(--line) !important;
+  color: var(--ink-2) !important;
+}
+html.ux .insight.next { background: var(--brand-strong) !important; border-color: transparent !important; }
+html.ux .insight.next * { color: #04241a !important; }
+/* —— 21. 修补：未定义的 --brand-strong、告警条、两处遗留灰 —— */
+html.ux { --brand-strong: #0b5f49; }
+html.ux #probeRegionWarning {
+  background: rgba(245, 198, 91, .12) !important;
+  border: 1px solid rgba(245, 198, 91, .34) !important;
+  color: #f5c65b !important;
+  border-radius: var(--r-md) !important;
+}
+html.ux .learned-text { color: var(--ink-2) !important; }
+html.ux .insight.next {
+  background: rgba(70, 226, 166, .10) !important;
+  background-image: none !important;
+  border: 1px solid rgba(70, 226, 166, .30) !important;
+}
+html.ux .insight.next * { color: var(--ink) !important; }
+html.ux .insight.next strong { color: var(--brand-2) !important; }
+html.ux .insight.next svg { color: var(--brand) !important; }
+html.ux .concept-section small,
+html.ux .outcome-section small {
+  font-size: 12px !important;
+  color: var(--ink-3) !important;
+}
+/* —— 22. 色轮圆心的小字 —— */
+html.ux #wheelSmall,
+html.ux .wheel-center span,
+html.ux .wheel-center strong span {
+  font-size: 12px !important;
+  color: var(--ink-3) !important;
+  line-height: 1.35 !important;
+}
+/* —— 23. 窄屏收口：溢出、被挤扁的按钮与下拉、最后一处 10px —— */
+html.ux .wheel-step .icon-button {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+}
+html.ux .class-record > .capture-button {
+  min-width: 44px !important;
+  flex: 1 1 auto;
+}
+html.ux .sample-labels > span,
+html.ux .sample-labels small { font-size: 12px !important; color: var(--ink-3) !important; }
+html.ux .sample-labels select { min-width: 108px !important; }
+html.ux .camera-controls select,
+html.ux .sim-controls select { min-width: 96px !important; }
+html.ux #reset { min-width: 44px; }
+
+@media (max-width: 1100px) {
+  html.ux .journey { min-width: 0 !important; flex: 1 1 100% !important; }
+  html.ux .sessionbar { flex-wrap: wrap !important; }
+  html.ux .class-record > .capture-button { flex: 1 1 100% !important; width: 100% !important; }
+  html.ux .camera-controls,
+  html.ux .sim-controls { flex-wrap: wrap !important; }
+}
+@media (max-width: 560px) {
+  html.ux #reset { width: auto !important; min-width: 44px !important; padding: 0 12px !important; }
+  html.ux .project-tools { gap: 6px !important; }
+}
+/* —— 24. 色块按钮也是可点元素 —— */
+html.ux .tone-row button {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  border-radius: var(--r-sm) !important;
+}
+html.ux .tone-row { min-height: 44px !important; }
+@media (max-width: 720px) {
+  html.ux .tone-grid { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
+}
+/* —— 25. 手机端顶栏与色块行不再横向溢出 —— */
+@media (max-width: 720px) {
+  html.ux .topbar {
+    flex-wrap: wrap !important;
+    height: auto !important;
+    min-height: 52px !important;
+    padding: 6px 10px !important;
+    row-gap: 4px !important;
+  }
+  html.ux .project-tools { flex-wrap: wrap !important; justify-content: flex-end !important; }
+  html.ux .topbar .quiet-button { min-width: 44px !important; padding: 0 10px !important; }
+  html.ux .topbar .quiet-button span { display: none; }
+  html.ux .brand-sub { display: none; }
+  html.ux .swatches { flex-wrap: wrap !important; row-gap: 2px !important; }
+  html.ux .view-tools { flex-wrap: wrap !important; }
+}
+/* —— 26. 课程带右侧控件组在窄屏换行 —— */
+@media (max-width: 1100px) {
+  html.ux .session-controls { flex-wrap: wrap !important; justify-content: flex-start !important; }
+}
+@media (max-width: 560px) {
+  html.ux .session-controls .quiet-button span { display: none; }
+  html.ux .session-controls .quiet-button { min-width: 44px !important; padding: 0 10px !important; }
+  html.ux .session-controls { gap: 6px !important; }
+}
+/* —— 27. 浮层构图：内容居中单栏、留出关闭按钮的位置、把折叠标题做成小节标题 —— */
+html.ux body.ux-overlay .concept-section,
+html.ux body.ux-overlay .outcome-section {
+  display: block !important;
+  padding: clamp(64px, 8vh, 88px) clamp(20px, 4vw, 56px) 48px !important;
+  overflow-y: auto !important;
+  background: var(--bg) !important;
+}
+html.ux body.ux-overlay .concept-section > *,
+html.ux body.ux-overlay .outcome-section > * {
+  max-width: 1240px;
+  margin-left: auto;
+  margin-right: auto;
+}
+html.ux body.ux-overlay #colorExperiment {
+  margin-top: var(--s-4) !important;
+  border-top: 1px solid var(--line) !important;
+  padding-top: var(--s-4) !important;
+}
+html.ux body.ux-overlay #colorExperiment > summary {
+  font-size: 13px !important;
+  color: var(--ink-3) !important;
+  padding: 8px 0 !important;
+  list-style: none;
+}
+html.ux body.ux-overlay .concept-section .section-heading { margin: var(--s-4) 0 0 !important; }
+html.ux body.ux-overlay .concept-section .section-heading h3 { margin: 0 0 var(--s-3) !important; }
+html.ux body.ux-overlay .outcome-content { margin-top: var(--s-4) !important; }
+html.ux body.ux-overlay .ux-overlay-close { right: clamp(20px, 4vw, 56px); }
+/* —— 28. 04 浮层改成两栏仪器台：左「它学到了什么」，右「颜色地图」 —— */
+@media (min-width: 1101px) {
+  html.ux body.ux-overlay .concept-section {
+    display: grid !important;
+    grid-template-columns: minmax(340px, .78fr) minmax(0, 1.22fr);
+    column-gap: clamp(20px, 2.6vw, 40px);
+    row-gap: var(--s-4);
+    align-items: start;
+    align-content: start;
+    padding: 56px clamp(20px, 3.4vw, 52px) 56px !important;
+  }
+  html.ux body.ux-overlay .concept-section > .sample-learning-result {
+    grid-column: 1;
+    grid-row: 1;
+    max-width: none;
+    margin: 0 !important;
+    position: sticky;
+    top: 0;
+  }
+  html.ux body.ux-overlay .concept-section > #colorExperiment {
+    grid-column: 2;
+    grid-row: 1;
+    max-width: none;
+    margin: 0 !important;
+    border-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  html.ux body.ux-overlay .concept-section > #colorExperiment > summary { display: none; }
+  html.ux body.ux-overlay .concept-section .concept-body {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: var(--s-4) !important;
+  }
+  html.ux body.ux-overlay .concept-section .wheel-panel { max-height: none; }
+  html.ux body.ux-overlay .concept-section #toneGrid {
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 3px !important;
+  }
+}
+/* —— 29. 中间栏改网格：指标卡与准确率曲线并排，把高度还给神经网络图 —— */
+@media (min-width: 1101px) {
+  html.ux .train-stage {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.04fr) minmax(0, .96fr);
+    column-gap: var(--s-3) !important;
+    align-content: start !important;
+    align-items: start !important;
+  }
+  html.ux .train-stage > .stage-heading,
+  html.ux .train-stage > #learningProcess,
+  html.ux .train-stage > .learning-phases,
+  html.ux .train-stage > .training-summary,
+  html.ux .train-stage > .learning-sample,
+  html.ux .train-stage > .network-wrap,
+  html.ux .train-stage > .network-legend,
+  html.ux .train-stage > .lesson-controls,
+  html.ux .train-stage > .history-control,
+  html.ux .train-stage > .chart-caption,
+  html.ux .train-stage > .metrics,
+  html.ux .train-stage > .primary-button,
+  html.ux .train-stage > .under-note { grid-column: 1 / -1 !important; }
+  html.ux .train-stage > .learning-measures { grid-column: 1 !important; }
+  html.ux .train-stage > .chart-wrap { grid-column: 2 !important; margin-top: 4px !important; }
+  html.ux .train-stage > * + * { margin-top: 0 !important; }
+  html.ux .train-stage > * { margin-bottom: 4px !important; }
+  html.ux .train-stage > .network-wrap { min-height: 150px !important; margin-bottom: 4px !important; }
+  html.ux .train-stage > .learning-measures { margin-bottom: 4px !important; }
+  html.ux .train-stage > .chart-wrap { margin-bottom: 4px !important; }
+  html.ux .train-stage > .learning-measures div { padding: 5px 8px !important; }
+  html.ux .train-stage > .chart-wrap { height: 66px !important; }
+}
+@media (min-width: 1101px) {
+  html.ux .train-stage > .learning-measures {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 2px !important;
+  }
+  html.ux .train-stage > .learning-measures > div {
+    display: flex !important;
+    align-items: baseline !important;
+    justify-content: space-between !important;
+    gap: var(--s-2) !important;
+    padding: 2px 8px !important;
+    border-radius: var(--r-sm) !important;
+  }
+  html.ux .train-stage > .learning-measures strong { font-size: 16px !important; }
+  html.ux .train-stage > .learning-measures span { font-size: 12px !important; }
+}
+@media (min-width: 1101px) {
+  html.ux .train-stage > .network-wrap {
+    height: 152px !important;
+    min-height: 152px !important;
+    overflow: hidden !important;
+  }
+  html.ux .train-stage > .network-wrap canvas,
+  html.ux .train-stage > .network-wrap svg { width: 100% !important; height: 100% !important; display: block; }
+  html.ux .train-stage > .chart-wrap { height: 60px !important; }
+  html.ux .train-stage > .metrics { margin: 0 0 2px !important; }
+  html.ux .train-stage > .metrics strong { font-size: 17px !important; }
+  html.ux #learningProcess { padding-top: 6px !important; }
+  html.ux .train-stage > .primary-button { min-height: 46px !important; height: 46px !important; }
+  html.ux .train-stage > .under-note { padding-bottom: 4px !important; }
+}
+@media (min-width: 1101px) {
+  html.ux .train-stage > .network-legend {
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: var(--s-2) !important;
+    height: 20px !important;
+    min-height: 20px !important;
+  }
+  html.ux .train-stage > .network-legend span { white-space: nowrap !important; }
+  html.ux .train-stage > .network-legend span:last-child {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    color: var(--ink-4) !important;
+  }
+  html.ux .train-stage > .learning-measures > div { flex-wrap: nowrap !important; }
+  html.ux .train-stage > .learning-measures > div > span {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+  html.ux .train-stage > .learning-measures > div > strong { flex: none !important; white-space: nowrap !important; }
+  html.ux .train-stage > .learning-measures > .badge { justify-self: start; }
+}
+@media (min-width: 1101px) {
+  html.ux .train-stage > .stage-heading { min-height: 52px !important; }
+  html.ux .train-stage > .learning-phases { min-height: 30px !important; }
+  html.ux .train-stage > .learning-phases button { height: 30px !important; min-height: 30px !important; }
+  html.ux .train-stage > .metrics { align-items: center !important; height: 40px !important; }
+  html.ux .train-stage > .metrics strong { font-size: 16px !important; line-height: 1.1 !important; }
+  html.ux .train-stage > .metrics div { line-height: 1.15 !important; }
+  html.ux .train-stage > .primary-button { height: 44px !important; min-height: 44px !important; }
+  html.ux .train-stage > .under-note { padding: 0 0 2px !important; line-height: 1.35 !important; }
+}
+@media (min-width: 1101px) {
+  html.ux .train-stage > .learning-phases { padding: 0 !important; gap: var(--s-2) !important; }
+  html.ux .train-stage > .primary-button { padding: 10px 16px !important; line-height: 1.2 !important; }
+  html.ux .train-stage > .learning-measures { row-gap: 0 !important; }
+  html.ux .train-stage > .learning-measures > div { padding: 1px 8px !important; min-height: 26px !important; }
+  html.ux .train-stage > .learning-measures > .badge { padding: 0 8px !important; min-height: 20px !important; }
+}
+@media (min-width: 1101px) {
+  html.ux .train-stage > * { margin-bottom: 2px !important; }
+  html.ux .train-stage > .network-wrap { height: auto !important; min-height: 190px !important; }
+}
+@media (min-width: 1101px) {
+  html.ux .train-stage > .network-wrap { min-height: 156px !important; }
+}
+@media (min-width: 1101px) {
+  html.ux .train-stage > .network-wrap {
+    height: 158px !important;    min-height: 158px !important;    max-height: 158px !important;
+    overflow: hidden !important;
+  }
+  html.ux .train-stage > .network-wrap canvas { width: 100% !important; height: 100% !important; }
+  html.ux .train-stage > .learning-sample { min-height: 0 !important; padding: 4px 8px !important; }
+}
+/* —— 30. 矮屏（1366×768 一类教室电脑）：压到仍然一屏 —— */
+@media (min-width: 1101px) and (max-height: 840px) {
+  html.ux { --topbar-h: 48px; --status-h: 24px; }
+  html.ux .topbar { height: 48px !important; }
+  html.ux .sessionbar { padding-top: var(--s-2) !important; padding-bottom: var(--s-2) !important; }
+  html.ux .sessionbar h2 { font-size: 15px !important; }
+  html.ux .journey { height: 34px !important; }
+  html.ux .journey li { min-height: 34px !important; }
+
+  html.ux .train-stage > .network-wrap { height: 118px !important; min-height: 118px !important; max-height: 118px !important; }
+  html.ux .train-stage > .network-legend span:last-child { display: none !important; }
+  html.ux .train-stage > #learningProcess { padding: 4px 16px 0 !important; }
+  html.ux .train-stage > .chart-wrap { height: 46px !important; }
+  html.ux .train-stage > .metrics { height: 32px !important; }
+  html.ux .train-stage > .metrics strong { font-size: 15px !important; }
+  html.ux .train-stage > .primary-button { height: 44px !important; min-height: 44px !important; }
+  html.ux .train-stage > .under-note { display: none !important; }
+  html.ux .train-stage > .learning-measures { grid-template-columns: minmax(0, 1fr) !important; }
+  html.ux .train-stage > .learning-measures > div { padding: 0 8px !important; }
+  html.ux .train-stage > .learning-measures > .badge { display: none !important; }
+  html.ux .train-stage > .lesson-controls { min-height: 40px !important; }
+  html.ux .train-stage > .history-control { padding: 0 !important; }
+
+  html.ux .infer-stage > .viewfinder { aspect-ratio: auto !important; height: 168px !important; }
+  html.ux .infer-stage > .sim-controls { min-height: 44px !important; padding: 2px 0 !important; }
+  html.ux .infer-stage > .prediction { padding: 4px 10px !important; }
+  html.ux .infer-stage > .prediction strong { font-size: 26px !important; }
+  html.ux .infer-stage > .score-row { min-height: 20px !important; }
+  html.ux .infer-stage > .inference-footer { display: none !important; }
+  html.ux .infer-stage > .touch-label-section { min-height: 40px !important; padding: 2px 10px !important; }
+  html.ux .infer-stage > .primary-button { height: 44px !important; min-height: 44px !important; }
+  html.ux .data-stage > .thumbnails { grid-auto-rows: 28px !important; }
+}
+@media (min-width: 1101px) and (max-height: 840px) {
+  html.ux .train-stage > #train,
+  html.ux .infer-stage > #challenge { height: 44px !important; min-height: 44px !important; padding: 6px 16px !important; line-height: 1.2 !important; }
+  html.ux .infer-stage > #scoreBars { gap: 2px !important; }
+  html.ux .infer-stage > #scoreBars .score-row { height: 22px !important; min-height: 22px !important; padding: 0 !important; }
+  html.ux .infer-stage > .sim-controls { height: 44px !important; min-height: 44px !important; padding: 0 !important; }
+  html.ux .infer-stage > .camera-controls { height: 44px !important; min-height: 44px !important; padding: 0 !important; }
+  html.ux .train-stage > .learning-measures > div { min-height: 20px !important; }
+}
+@media (min-width: 1101px) and (max-height: 840px) {
+  html.ux .train-stage > .network-legend { display: none !important; }
+  html.ux .train-stage > .network-wrap { height: 126px !important; min-height: 126px !important; max-height: 126px !important; }
+}
+@media (min-width: 1101px) and (max-height: 780px) {
+  html.ux .train-stage > .network-wrap { height: 124px !important; min-height: 124px !important; max-height: 124px !important; }
+  html.ux .train-stage > #learningProcess { display: none !important; }
+  html.ux .train-stage > .history-control { display: none !important; }
+  html.ux .infer-stage > .viewfinder { height: 140px !important; }
+  html.ux .infer-stage > .prediction strong { font-size: 24px !important; }
+  html.ux .infer-stage > .prediction { padding: 2px 10px !important; }
+}
+@media (min-width: 1101px) and (max-height: 780px) {
+  html.ux .infer-stage > .viewfinder { height: 130px !important; }
+}

@@ -1,0 +1,101 @@
+﻿<!doctype html> <!-- 精修版入口：与 index.html 共用全部业务脚本与原始样式，只额外叠加一层 ux.css。 -->
+<html lang="zh-CN" class="ux"> <!-- ux 类把精修层的作用域限定在本页，原版页面不受影响。 -->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light"> <!-- 声明浅色界面，避免浏览器反转控件配色。 -->
+<meta name="description" content="三格学习台精修版：给 AI 当一回老师，用真实训练样本观察神经网络如何学会颜色。">
+<title>三格学习台 · 精修版</title> <!-- 与原版区分，便于课堂上两个标签页并存。 -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230e6b54'/%3E%3Ccircle cx='11' cy='12' r='3' fill='%23e2b93b'/%3E%3Ccircle cx='21' cy='12' r='3' fill='%23d76a5e'/%3E%3Ccircle cx='16' cy='22' r='3' fill='%235b93d6'/%3E%3C/svg%3E"> <!-- 内联 SVG 图标：免一次 /favicon.ico 的 404。 -->
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="onescreen.css">
+<link rel="stylesheet" href="remote.css">
+<link rel="stylesheet" href="gm92.css">
+<link rel="stylesheet" href="display.css">
+<link rel="stylesheet" href="exhibition.css">
+<link rel="stylesheet" href="ux.css"> <!-- 精修层：设计令牌 + 工作台布局 + 可读性与热区修复，必须最后加载。 -->
+<script src="lucide.min.js" defer></script>
+<script src="app.js" defer></script>
+<script src="training-view.js" defer></script>
+<script src="lesson.js" defer></script>
+<script src="concept-view.js" defer></script>
+<script src="effects.js" defer></script>
+<script src="remote.js" defer></script>
+<script src="gm92.js" defer></script>
+<script src="display.js" defer></script>
+<script src="exhibition.js" defer></script>
+<script src="ux.js" defer></script> <!-- 精修层的少量渐进增强：进度语义、版本说明、键盘可达性。 -->
+</head>
+<body>
+<a class="skip-link" href="#workspace">跳到工作台</a> <!-- 键盘用户按 Tab 第一下即可越过顶栏。 -->
+<header class="topbar">
+<div class="brand"><span class="brand-mark"><i data-lucide="blocks"></i></span><div><h1>三格学习台</h1><span class="brand-sub">天橙 · AI 互动课堂 · 精修版</span></div></div>
+<div class="project-tools"><span class="local-indicator"><span></span>本机运行</span><button id="import" class="icon-button" title="导入项目" aria-label="导入项目"><i data-lucide="folder-open"></i></button><button id="export" class="icon-button" title="导出项目" aria-label="导出项目"><i data-lucide="download"></i></button><button id="settings" class="icon-button" title="类别设置" aria-label="类别设置"><i data-lucide="settings-2"></i></button><span class="divider"></span><a class="quiet-button version-switch" href="./" title="回到未经改动的原版界面">原版</a><button id="reset" class="quiet-button"><i data-lucide="rotate-ccw"></i>重新教学</button></div>
+</header>
+<main id="workspace">
+<section class="sessionbar">
+<div class="lesson-title"><div class="eyebrow">学习实验 / 01</div><h2>给 AI 当一回老师</h2><p class="mission">目标：只给机器人看例子，让它<b>自己总结出“颜色”的定义</b>，再看看它到底学会了什么。</p></div>
+<div class="session-controls"><span id="stateBadge" class="badge">等待采集</span><button id="outcomeJump" class="quiet-button"><i data-lucide="chart-column"></i><span>学习结果</span></button><div class="segmented" aria-label="画面来源"><button id="cameraMode" aria-pressed="true"><i data-lucide="camera"></i>摄像头</button><button id="simMode" aria-pressed="false"><i data-lucide="box"></i>模拟台</button></div><button id="displayOpen" class="quiet-button" title="查看 GM92 立式触控大屏的连接地址"><i data-lucide="monitor-up"></i><span>GM92 大屏</span></button><button id="fullscreen" class="icon-button" title="切换全屏" aria-label="切换全屏"><i data-lucide="maximize"></i></button></div>
+</section>
+<ol class="journey" id="journey" aria-label="教学进度"><li data-step="teach"><b>1</b><span>教<small>给出例子和名字</small></span></li><li data-step="learn"><b>2</b><span>学<small>神经网络调整参数</small></span></li><li data-step="understand"><b>3</b><span>懂<small>画出它心中的颜色</small></span></li><li data-step="test"><b>4</b><span>考<small>用新样品检验</small></span></li></ol>
+<nav id="touchViews" class="segmented" aria-label="触屏教学步骤" hidden><button data-lesson-view="label" aria-pressed="true"><i data-lucide="hand"></i><span><b>教</b>标定样本</span><em class="nav-badge" id="navLabel"></em></button><button data-lesson-view="train" aria-pressed="false"><i data-lucide="brain-circuit"></i><span><b>学</b>观察训练</span><em class="nav-badge" id="navTrain"></em></button><button data-lesson-view="concept" aria-pressed="false"><i data-lucide="palette"></i><span><b>懂</b>颜色地图</span><em class="nav-badge" id="navConcept"></em></button><button data-lesson-view="result" aria-pressed="false"><i data-lucide="badge-check"></i><span><b>考</b>检验结果</span><em class="nav-badge" id="navResult"></em></button></nav>
+<div class="workspace">
+<section class="stage data-stage" aria-labelledby="stageDataTitle">
+<div class="stage-heading"><span class="step-number">01</span><h3 id="stageDataTitle">样本标定</h3><span id="totalCount" class="stage-meta">0 张</span></div>
+<div id="classList"></div>
+<div class="data-footer"><i data-lucide="database"></i><span id="datasetSource">尚无样本</span><span id="savedState">已保存</span></div>
+<div class="reference-section"><h4>颜色校准 <span id="referenceStatus">未校准</span></h4><div class="reference-values" id="referenceValues">白色参考 —</div><div class="reference-actions"><button id="referenceOpen" class="quiet-button"><i data-lucide="pipette"></i>校准白色参考</button><button id="referenceClear" class="icon-button" title="移除颜色校准" aria-label="移除颜色校准" disabled><i data-lucide="rotate-ccw"></i></button></div></div>
+</section>
+<section class="stage train-stage" aria-labelledby="stageTrainTitle">
+<div class="stage-heading"><span class="step-number">02</span><h3 id="stageTrainTitle">神经网络学习</h3><span class="stage-meta" id="modelName">MobileNetV2 / CPU</span><button id="trainingFocus" class="icon-button" title="放大训练视图" aria-label="放大训练视图"><i data-lucide="expand"></i></button></div>
+<div class="learning-phases"><span id="featurePhase">视觉特征 <small>已预训练</small></span><i data-lucide="arrow-right"></i><span id="learningPhase">分类网络 <small>本轮学习</small></span></div>
+<div class="training-summary"><span id="trainTitle">等待样本就绪</span><span id="epochCount">0 / 80 轮</span></div>
+<div class="learning-sample"><img id="learningImage" alt="当前展示的真实训练样本" hidden><div class="sample-fallback" id="learningImageEmpty"><i data-lucide="image"></i></div><div class="sample-labels"><select id="learningProbe" aria-label="选择观察的训练类别"></select><span>正确标签：<strong id="targetLabel">—</strong></span></div><div class="prediction-change"><span id="beforePrediction">—</span><i data-lucide="arrow-right"></i><strong id="afterPrediction">—</strong></div></div>
+<div class="network-wrap"><div id="trainingFeed" class="training-feed" aria-hidden="true"><div class="feed-track"></div></div><canvas id="networkCanvas" aria-label="实测神经元激活与连接权重节选"></canvas></div>
+<div class="network-legend"><span><b class="positive-key"></b>正权重</span><span><b class="negative-key"></b>负权重</span><span>输入、隐藏层、输出都来自同一张照片 · 输出 = 它对三类的得分（合计 100%）· 流动光点仅为示意</span></div>
+<div class="learning-measures"><div><span>训练样本答对</span><strong id="fitCount">—</strong></div><div><span>本轮参数变化量</span><strong id="weightDelta">—</strong></div><span id="recordMode" class="badge">等待记录</span></div>
+<div class="lesson-controls"><label class="pace-label">节奏<select id="trainingPace" aria-label="训练节奏"><option value="150">课堂</option><option value="350">讲解</option><option value="0">快速</option></select></label><div class="round-tools"><button id="trainingPause" class="icon-button" title="暂停实际训练" aria-label="暂停实际训练" disabled><i data-lucide="pause"></i></button><button id="trainingStep" class="icon-button" title="实际训练一轮" aria-label="实际训练一轮" disabled><i data-lucide="step-forward"></i></button><span class="divider"></span><button id="trainingReplay" class="icon-button" title="回放真实训练记录" aria-label="回放真实训练记录" disabled><i data-lucide="repeat-2"></i></button></div></div>
+<div class="history-control"><input id="trainingHistory" type="range" min="1" max="80" value="1" disabled aria-label="查看真实训练轮次"><span id="historyPosition">0 / 80</span></div>
+<div class="chart-wrap"><canvas id="lossChart" aria-label="实际训练损失曲线"></canvas><div id="chartEmpty"><i data-lucide="chart-no-axes-combined"></i><span>尚未训练</span></div></div>
+<div class="chart-caption"><span>训练损失</span><span>训练轮次 →</span></div>
+<div class="metrics"><div><span>当前损失</span><strong id="lossValue">—</strong></div><div><span>训练用时</span><strong id="trainTime">—</strong></div></div>
+<button id="train" class="primary-button" disabled><i data-lucide="play"></i><span>开始训练</span></button>
+<div id="trainRequirement" class="under-note">每类至少 3 张</div>
+</section>
+<section class="stage infer-stage" aria-labelledby="stageInferTitle">
+<div class="stage-heading"><span class="step-number">03</span><h3 id="stageInferTitle">推理</h3><span id="sourceBadge" class="stage-meta">摄像头未连接</span></div>
+<div class="viewfinder" id="viewfinder"><canvas id="preview" width="640" height="480" aria-label="教学区实时画面"></canvas><div class="roi-frame" id="roiFrame"><span>教学区</span></div><div class="view-tools"><button id="selectRoi" class="icon-button" title="框选教学区" aria-label="框选教学区" aria-pressed="false"><i data-lucide="scan"></i></button><button id="resetRoi" class="icon-button" title="恢复默认教学区" aria-label="恢复默认教学区"><i data-lucide="scan-line"></i></button></div><div id="cameraOverlay"><i data-lucide="camera"></i><button id="connectCamera" class="camera-button">连接摄像头</button><span id="cameraMessage">未连接</span></div><span id="liveBadge" class="live-badge" hidden>LIVE</span></div>
+<div id="cameraControls" class="camera-controls"><select id="cameraSelect" aria-label="选择摄像头"><option value="">选择摄像头</option></select><button id="refreshCameras" class="icon-button" title="刷新摄像头列表" aria-label="刷新摄像头列表"><i data-lucide="list-restart"></i></button><button id="reconnect" class="icon-button" title="连接所选摄像头" aria-label="连接所选摄像头"><i data-lucide="plug"></i></button></div>
+<div id="simControls" class="sim-controls" hidden><div class="swatches" aria-label="模拟物体颜色"><button data-color="#dc4845" style="--swatch:#dc4845" title="红色色块" aria-label="红色色块" aria-pressed="true"></button><button data-color="#e5bd37" style="--swatch:#e5bd37" title="黄色色块" aria-label="黄色色块" aria-pressed="false"></button><button data-color="#398bc0" style="--swatch:#398bc0" title="蓝色色块" aria-label="蓝色色块" aria-pressed="false"></button><button data-color="#43a17a" style="--swatch:#43a17a" title="未教过的绿色色块" aria-label="未教过的绿色色块" aria-pressed="false"></button><button data-color="empty" class="empty-swatch" title="移走物体" aria-label="移走物体"><i data-lucide="ban"></i></button></div><button id="moveObject" class="icon-button" title="改变物体位置" aria-label="改变物体位置"><i data-lucide="move"></i></button><label class="light-control"><i data-lucide="sun"></i><input id="light" type="range" min="65" max="125" value="100" aria-label="模拟亮度"></label></div>
+<div class="prediction"><span id="predictionLabel">等待训练</span><span id="predictionScore">—</span></div>
+<div id="scoreBars"></div>
+<div class="inference-footer"><span id="inferenceStatus">模型未就绪</span><button id="pauseInference" class="icon-button" title="暂停识别" aria-label="暂停识别" disabled><i data-lucide="pause"></i></button></div>
+<div class="touch-label-section"><h4>当前样品是什么？</h4><div id="touchLabels" class="touch-labels"></div><span id="labelReceipt" class="receipt">尚未标定当前样品</span></div>
+<button id="challenge" class="primary-button" disabled><i data-lucide="scan-eye"></i>拍摄新样品 · 检验学习结果</button>
+</section>
+</div>
+<section class="concept-section" id="conceptSection">
+<div class="concept-heading"><div><span class="eyebrow">04 / 学习成果 · 它学会了什么</span><h3 id="conceptTitle">AI 心中的颜色定义</h3></div><div class="concept-tools"><span id="conceptStatus" class="badge">等待训练</span><div class="segmented" id="conceptTones" aria-label="选择颜色深浅"></div><button id="conceptReplay" class="icon-button" title="重新播放揭晓动画" aria-label="重新播放揭晓动画" disabled><i data-lucide="sparkles"></i></button></div></div>
+<div class="purpose-card"><div class="purpose-q"><i data-lucide="circle-help"></i><span>反复给它看红色、蓝色瓶盖，目的是什么？</span></div><p>机器人一开始<strong>没有“红色”这个词</strong>，看到的只是成千上万个像素数字。你给它看例子、告诉它名字，它就自己在颜色世界里<strong>划出一块地盘</strong>，叫做“红色”。<br>怎么知道它划得对不对？我们分三步核对：①<strong>原照片</strong>——它把教过的照片认回来了吗（只说明记住了例子）；②<strong>合成换色</strong>——把每类一张底图里的瓶盖电脑刷成 36 种色相 × 4 种深浅，逐张交给模型回答，看它到底靠颜色还是靠别的线索；③<strong>新样品考试</strong>——第 4 步用没见过的实物检验。下面的色轮是第②步的真实回答。</p></div>
+<div class="concept-body" id="conceptBody">
+<div class="wheel-panel"><div class="wheel-wrap"><svg id="conceptWheel" viewBox="-200 -200 400 400" role="img" aria-label="模型对36种色相的回答"></svg><div class="wheel-center" id="wheelCenter"><strong id="wheelBig">—</strong><span id="wheelSmall">训练完成后自动绘制</span></div></div><div id="conceptBases" class="segmented concept-bases" aria-label="选择换色底图"></div><div class="wheel-step"><button id="conceptPrev" class="icon-button" title="上一个色相" aria-label="上一个色相" disabled><i data-lucide="chevron-left"></i></button><span id="conceptBaseNote" class="base-note"></span><button id="conceptNext" class="icon-button" title="下一个色相" aria-label="下一个色相" disabled><i data-lucide="chevron-right"></i></button></div><div id="wheelTip" class="wheel-tip" hidden><img id="wheelTipImage" alt="换色后的真实探测照片"><div><span id="wheelTipColor"></span><strong id="wheelTipAnswer"></strong><span id="wheelTipScores"></span><span id="wheelTipMask" class="tip-mask"></span></div><div id="wheelTipBases" class="tip-bases"></div></div><div class="wheel-legend"><span><b class="ring-inner"></b>内圈：刷上的颜色</span><span><b class="ring-outer"></b>外圈：AI 的回答（越实越肯定）</span><span><b class="ring-mark"></b>你教过的颜色</span></div></div>
+<div class="definition-panel"><div id="definitionCards" class="definition-cards"></div><div class="tone-map"><div class="tone-map-head"><span>换个深浅还认得吗？</span><small id="toneMapNote">合成换色探测 · 颜色 = AI 的回答</small></div><div id="toneGrid" class="tone-grid"></div><div id="neutralRow" class="neutral-row"></div></div></div>
+</div>
+<div class="insight-strip" id="insights"><div class="insight placeholder"><i data-lucide="hourglass"></i><span>完成训练后，这里会用真实测量结果回答：它学会了什么、哪里学偏了、下一步该怎么教。</span></div></div>
+<div class="compare-strip" id="conceptCompare" hidden></div>
+</section>
+<section class="outcome-section" id="outcomeSection"><div class="outcome-heading"><div><span class="eyebrow">05 / 用新样品检验</span><h3 id="outcomeTitle">等待完成训练</h3></div><button id="exportResult" class="icon-button" title="导出本轮检验结果" aria-label="导出本轮检验结果" disabled><i data-lucide="download"></i></button></div><div class="outcome-content"><div class="outcome-score"><strong id="examScore">—</strong><span id="examCaption">新画面检验</span><span id="examVerdict">尚无检验结果</span></div><div class="outcome-details"><div id="categoryResults" class="category-results"></div><p id="outcomeMeaning">等待采样、标定和训练</p><div id="examLatest" class="exam-latest" hidden><img id="examImage" alt="最近一次实际检验画面"><div><span id="examExpected"></span><strong id="examAnswer"></strong></div><span id="examMatch" class="badge"></span></div></div><div class="confusion-wrap"><table id="confusion"><caption>实际类别 ↓ / 模型回答 →</caption><thead></thead><tbody></tbody></table></div></div></section>
+<div class="android-connection"><button id="androidConnect" class="quiet-button"><i data-lucide="tablet-smartphone"></i>安卓触屏</button><span id="connectionState">同一课堂网络</span></div>
+<footer class="statusbar"><span id="statusText">就绪</span><span>模型输出得分 · 未经概率校准</span><span id="clock">离线可用</span></footer>
+</main>
+<video id="video" playsinline muted hidden></video>
+<input id="importFile" type="file" accept=".json,application/json" aria-label="导入项目记录文件" hidden>
+<dialog id="settingsDialog"><form id="namesForm"><h2>类别设置</h2><label>类别一<input id="name0" maxlength="12" required></label><label>类别二<input id="name1" maxlength="12" required></label><label>类别三<input id="name2" maxlength="12" required></label><div class="dialog-actions"><button type="button" id="cancelSettings" class="quiet-button">取消</button><button class="primary-button" type="submit">保存</button></div></form></dialog>
+<dialog id="confirmDialog"><h2 id="confirmTitle">重新教学</h2><p id="confirmText">清空当前样本和模型？</p><div class="dialog-actions"><button id="confirmCancel" class="quiet-button">取消</button><button id="confirmYes" class="danger-button">确认清空</button></div></dialog>
+<dialog id="referenceDialog"><div class="dialog-heading"><h2>校准白色参考</h2><button id="referenceClose" class="icon-button" title="关闭" aria-label="关闭"><i data-lucide="x"></i></button></div><p>让无反光的白纸或中性灰卡铺满教学区，避开阴影和过曝。</p><canvas id="referencePreview" width="192" height="144" aria-label="白色参考实时画面"></canvas><p id="referenceError" role="status">校准将用于本轮训练和识别；已有模型需要重新训练。</p><button id="referenceMeasure" class="primary-button"><i data-lucide="pipette"></i>测量并应用</button></dialog>
+<dialog id="challengeDialog"><div class="dialog-heading"><h2>这次模型学会了吗？</h2><button id="challengeClose" class="icon-button" title="关闭" aria-label="关闭"><i data-lucide="x"></i></button></div><img id="challengeImage" alt="尚未揭晓答案的检验照片"><h4>这张照片的正确类别是？</h4><div id="challengeLabels" class="touch-labels"></div><p id="challengeError" role="status">本次照片只用于检验，不加入训练。</p></dialog>
+<dialog id="androidDialog"><div class="dialog-heading"><h2>安卓触屏连接</h2><button id="androidClose" class="icon-button" title="关闭" aria-label="关闭"><i data-lucide="x"></i></button></div><p id="androidMessage"></p><div id="androidLinks"></div></dialog>
+<div id="toast" role="status" hidden></div>
+</body>
+</html>
