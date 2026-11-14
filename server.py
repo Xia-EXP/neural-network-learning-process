@@ -1,7 +1,8 @@
 from __future__ import annotations  # Allow forward-compatible type annotations.
-import base64, hashlib, io, json, os, socket, uuid, threading, time, webbrowser  # Provide image identity, unique atomic storage, exclusive ports, and background training.
+import base64, binascii, hashlib, io, json, os, secrets, socket, uuid, threading, time, webbrowser  # Provide image identity, LAN request tokens, and robust input handling.
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer  # Serve the offline application and its API.
 from pathlib import Path  # Resolve assets relative to this file, independent of the launch directory.
+from urllib.parse import parse_qs, urlsplit  # Read token query parameters without treating the URL path as trusted input.
 import numpy as np  # Represent image features and training targets.
 from PIL import Image  # Decode and resize camera snapshots consistently.
 from sklearn.neural_network import MLPClassifier  # Use a maintained neural-network implementation for real training.
@@ -21,14 +22,24 @@ STATE = dict(samples=[], names=LABELS.copy(), curve=[], trace=[], training=False
 STATE.update(calibration=None, evaluations=[], concept=None)  # Retain the current reference profile, fresh-frame results, and the measured color map of the current model.
 STATE.update(runs=[], tests=[], run_id=None, history_revision=0, pause_ack=False, extraction_index=None, extraction_view=0, benchmark_done=0, benchmark_total=0)  # 分开保存持久训练摘要、独立检验照片以及安全暂停位置。
 LIVE = dict(image=None, source=None, updated=0)  # Hold only the latest shared teaching-region frame in volatile memory for the Android touch panel.
+LAN_MODE = '--lan' in os.sys.argv  # LAN exposure is opt-in and must be visible in the launch command.
+LAN_TOKEN = os.environ.get('LEARNING_DESK_LAN_TOKEN', '').strip() or (secrets.token_urlsafe(24) if LAN_MODE else '')  # Require a per-launch token when the service leaves localhost.
+
+def lan_request_token(path, headers):  # Accept the token from the header during API calls or from the initial page URL.
+    query = parse_qs(urlsplit(path).query)
+    return headers.get('X-Learning-Token', '') or (query.get('token') or [''])[0]
 
 def decode_image(value, keep=False):  # Validate a browser snapshot before feature extraction or storage; keep preserves the live-view size.
     if not isinstance(value, str) or len(value) > 160000: raise ValueError('图片过大或格式不正确')  # Bound image input size.
-    raw = base64.b64decode(value.split(',', 1)[-1], validate=True)  # Decode the data URL strictly.
-    with Image.open(io.BytesIO(raw)) as image:  # Close the decoder after checking image dimensions.
-        if image.width > 640 or image.height > 480: raise ValueError('图片尺寸超过限制')  # Reject oversized decoded images.
-        unchanged = image.format == 'JPEG' and image.mode == 'RGB' and (keep or image.size == (192, 144))  # 已经符合采集规范的照片无需再次有损编码。
-        rgb = image.convert('RGB') if keep else image.convert('RGB').resize((192, 144))  # Normalize stored snapshots to a compact color image, keeping larger live frames sharp for the big screen.
+    try:
+        raw = base64.b64decode(value.split(',', 1)[-1], validate=True)  # Decode the data URL strictly.
+        with Image.open(io.BytesIO(raw)) as image:  # Close the decoder after checking image dimensions.
+            if image.width > 640 or image.height > 480: raise ValueError('图片尺寸超过限制')  # Reject oversized decoded images.
+            unchanged = image.format == 'JPEG' and image.mode == 'RGB' and (keep or image.size == (192, 144))  # 已经符合采集规范的照片无需再次有损编码。
+            rgb = image.convert('RGB') if keep else image.convert('RGB').resize((192, 144))  # Normalize stored snapshots to a compact color image, keeping larger live frames sharp for the big screen.
+    except (binascii.Error, OSError, ValueError) as error:
+        if str(error) == '图片尺寸超过限制': raise
+        raise ValueError('图片格式不正确') from error
     if unchanged: return 'data:image/jpeg;base64,' + base64.b64encode(raw).decode(), rgb  # 保持像素身份稳定，确保重复检测和训练泄漏检查可复现。
     output = io.BytesIO()  # Prepare an in-memory JPEG file.
     rgb.save(output, 'JPEG', quality=80)  # Store the actual captured image rather than fabricated thumbnails.
@@ -201,6 +212,8 @@ class LocalServer(ThreadingHTTPServer):  # Prevent Windows from silently sharing
 class Handler(SimpleHTTPRequestHandler):  # Combine static assets and a small local JSON API.
     def __init__(self, *args, **kwargs): super().__init__(*args, directory=str(ROOT / 'web'), **kwargs)  # Expose only public web assets.
     def log_message(self, *args): pass  # Keep repeated inference requests from flooding the launch window.
+    def request_path(self): return urlsplit(self.path).path  # Route by the path component so a token query does not bypass an endpoint.
+    def authorized(self): return not LAN_MODE or secrets.compare_digest(lan_request_token(self.path, self.headers), LAN_TOKEN)  # Protect every LAN API read and write with the same per-launch secret.
     def reply(self, payload, status=200):  # Send UTF-8 JSON with explicit caching and length headers.
         body = json.dumps(payload, ensure_ascii=False).encode('utf-8')  # Preserve Chinese labels in API responses.
         try:  # A visitor may navigate away while a camera inference response is being sent.
@@ -212,19 +225,23 @@ class Handler(SimpleHTTPRequestHandler):  # Combine static assets and a small lo
             self.wfile.write(body)  # Deliver the serialized response.
         except ConnectionError: self.close_connection = True  # End a disconnected response without attempting a second HTTP error response.
     def do_GET(self):  # Return live state, exported projects, or application assets.
-        if self.path == '/api/live':  # Share a transient station-camera crop without requiring Android camera permissions over HTTP.
+        path = self.request_path()
+        if path.startswith('/api/') and not self.authorized(): return self.reply(dict(error='局域网访问需要有效令牌'), 403)  # Do not expose classroom images or controls to unauthenticated LAN clients.
+        if path == '/api/live':  # Share a transient station-camera crop without requiring Android camera permissions over HTTP.
             with LOCK: return self.reply(dict(**LIVE, age=time.time()-LIVE['updated']))  # Include freshness so remote controls cannot label a disconnected stale image.
-        if self.path == '/api/connection': return self.reply(dict(lan='--lan' in os.sys.argv, port=self.server.server_port, addresses=lan_addresses()))  # Advertise only actual local adapter addresses for the optional touch panel.
-        if self.path == '/api/status': return self.reply(snapshot())  # Poll training progress without transferring images.
-        if self.path == '/api/learning':  # 按需读取已完成轮次和逐张固定检验证据。
+        if path == '/api/connection': return self.reply(dict(lan=LAN_MODE, port=self.server.server_port, addresses=lan_addresses(), token=LAN_TOKEN if LAN_MODE else ''))  # Advertise the token needed by the optional touch panel.
+        if path == '/api/status': return self.reply(snapshot())  # Poll training progress without transferring images.
+        if path == '/api/learning':  # 按需读取已完成轮次和逐张固定检验证据。
             with LOCK: return self.reply(dict(runs=list(STATE['runs']), tests=list(STATE['tests']), comparison=comparison(STATE['runs'], STATE['tests'], STATE['samples']), revision=STATE['history_revision'], run_id=STATE['run_id'], generation=STATE['generation'], in_training=[test['id'] for test in STATE['tests'] if any(fingerprint(sample['image']) == test['digest'] for sample in STATE['samples'])]))  # 历史详情同时指出已补入当前训练样本的检验照片。
-        if self.path == '/api/concept':  # Return the complete measured color map for the current model.
+        if path == '/api/concept':  # Return the complete measured color map for the current model.
             with LOCK: return self.reply(dict(concept=STATE['concept'], names=STATE['names'], generation=STATE['generation']))  # Include names so labels match the probed classes.
-        if self.path == '/api/project': return self.reply(snapshot(True))  # Restore the full classroom session.
-        if self.path.startswith('/api/'): return self.reply(dict(error='接口不存在'), 404)  # Reject misspelled API paths clearly.
+        if path == '/api/project': return self.reply(snapshot(True))  # Restore the full classroom session.
+        if path.startswith('/api/'): return self.reply(dict(error='接口不存在'), 404)  # Reject misspelled API paths clearly.
         return super().do_GET()  # Serve local HTML, JavaScript, styles, and icons.
     def do_POST(self):  # Validate and dispatch browser commands.
         try:  # Convert malformed requests into readable errors.
+            path = self.request_path()
+            if path.startswith('/api/') and not self.authorized(): return self.reply(dict(error='局域网访问需要有效令牌'), 403)  # Apply the same protection to sample, training, and reset mutations.
             origin = self.headers.get('Origin')  # Inspect the browser origin before allowing mutations.
             if origin and origin != 'http://' + self.headers.get('Host', ''): return self.reply(dict(error='请求来源不匹配'), 403)  # Accept only the application's own origin.
             length = int(self.headers.get('Content-Length', '0'))  # Read the declared JSON body size.
@@ -232,12 +249,12 @@ class Handler(SimpleHTTPRequestHandler):  # Combine static assets and a small lo
             body = json.loads(self.rfile.read(length))  # Parse structured input rather than manipulating JSON strings.
             if not isinstance(body, dict): raise ValueError('请求必须为对象')  # Ensure all route handlers receive a mapping.
             with LOCK:  # Apply each command as one consistent state transition.
-                if self.path == '/api/live':  # Update the volatile frame relayed from the station browser.
+                if path == '/api/live':  # Update the volatile frame relayed from the station browser.
                     if body.get('source') not in ['camera', 'simulation']: raise ValueError('画面来源无效')  # Keep remote labels associated with the real active source.
                     image, _ = decode_image(body.get('image'), keep=True)  # Bound and validate the shared teaching-region image.
                     LIVE.update(image=image, source=body['source'], updated=time.time())  # Replace the previous frame without persisting camera video.
                     return self.reply(dict(ok=True))  # Acknowledge the small periodic relay request.
-                if self.path == '/api/calibrate':  # Measure a neutral reference independently of semantic sample labels.
+                if path == '/api/calibrate':  # Measure a neutral reference independently of semantic sample labels.
                     if STATE['training']: raise ValueError('请先结束训练再校准颜色')  # Avoid changing preprocessing underneath an optimizer.
                     source = body.get('source')  # Associate the profile with its camera or simulated source.
                     if source not in ['camera', 'simulation'] or any(s['source'] != source for s in STATE['samples']): raise ValueError('参考物与现有样本来源不一致')  # Prevent cross-source color correction.
@@ -245,11 +262,11 @@ class Handler(SimpleHTTPRequestHandler):  # Combine static assets and a small lo
                     profile = measure_reference(image, source)  # Reject poor exposure, uneven patches, and extreme channel imbalance.
                     commit_project(calibration=profile)  # Save changed preprocessing transactionally and require fresh training.
                     return self.reply(snapshot())  # Display measured channel values and applied gains.
-                if self.path == '/api/calibration-clear':  # Restore raw-color processing explicitly.
+                if path == '/api/calibration-clear':  # Restore raw-color processing explicitly.
                     if STATE['training']: raise ValueError('请先结束训练再修改校准')  # Preserve training-input consistency.
                     commit_project(calibration=None)  # Remove the profile only after a successful save and invalidate its old model.
                     return self.reply(snapshot())  # Publish the uncalibrated state.
-                if self.path == '/api/evaluate':  # Examine a fresh frozen frame against the student's independently supplied expected label.
+                if path == '/api/evaluate':  # Examine a fresh frozen frame against the student's independently supplied expected label.
                     if not STATE['ready']: raise ValueError('请先完成训练')  # Never invent a test outcome before a usable model exists.
                     if body.get('generation') != STATE['generation']: raise ValueError('模型已变化，请重新拍摄检验画面')  # Reject a challenge captured under an obsolete model.
                     label, source = body.get('label'), body.get('source')  # Read the truth chosen before revealing the answer.
@@ -269,7 +286,7 @@ class Handler(SimpleHTTPRequestHandler):  # Combine static assets and a small lo
                     runs = [dict(run, checks=[item for item in run['checks'] if item['id'] != test['id']] + [check_result(test, scores)]) if run['id'] == STATE['run_id'] else run for run in STATE['runs']]  # 将这次真实答案关联到产生它的完成轮次。
                     commit_project(reset_model=False, tests=tests, runs=runs, evaluations=STATE['evaluations'] + [record], history_revision=STATE['history_revision'] + 1)  # 保存检验集和结果后才确认拍照检验成功。
                     return self.reply(snapshot())  # Present cumulative results and the revealed model answer.
-                if self.path == '/api/sample':  # Capture a labeled frame from the selected source.
+                if path == '/api/sample':  # Capture a labeled frame from the selected source.
                     if 'generation' in body and body['generation'] != STATE['generation']: raise ValueError('样本或标定已变化，请重新拍摄')  # Prevent a frozen capture from receiving labels under a different concurrent lesson state.
                     label, source = body.get('label'), body.get('source')  # Read class and capture-source metadata.
                     if type(label) is not int or label not in range(3) or source not in ['camera', 'simulation']: raise ValueError('类别或图像来源无效')  # Reject invalid capture metadata.
@@ -281,7 +298,7 @@ class Handler(SimpleHTTPRequestHandler):  # Combine static assets and a small lo
                     sample = dict(label=label, source=source, image=image)  # Store label and provenance beside the image.
                     commit_project(samples=STATE['samples'] + [sample])  # Save the added photograph and invalidate the old model as one recoverable transaction.
                     return self.reply(dict(sample=sample, state=snapshot()))  # Update the browser without reloading all thumbnails.
-                if self.path == '/api/sample-edit':  # Let visitors correct the actual human-provided labels rather than forcing model answers.
+                if path == '/api/sample-edit':  # Let visitors correct the actual human-provided labels rather than forcing model answers.
                     if STATE['training']: raise ValueError('请先完成训练，再修改标定')  # Keep the active optimization dataset immutable.
                     if type(body.get('generation')) is not int or body['generation'] != STATE['generation']: raise ValueError('样本已变化，请重新打开这张照片')  # Reject stale indices after another screen adds or edits photographs.
                     index, action, label = body.get('index'), body.get('action'), body.get('label')  # Read one explicit sample mutation and its semantic target.
@@ -296,7 +313,7 @@ class Handler(SimpleHTTPRequestHandler):  # Combine static assets and a small lo
                     else: updated.pop(index)  # Delete only the exact sample the visitor reviewed.
                     commit_project(samples=updated)  # Publish the reviewed edit and require retraining only after the save succeeds.
                     return self.reply(snapshot(True))  # Refresh thumbnails, counts, quality checks and the genuine model state together.
-                if self.path == '/api/train':  # Start a fresh training run from the current samples.
+                if path == '/api/train':  # Start a fresh training run from the current samples.
                     if STATE['training']: raise ValueError('当前正在训练')  # Prevent duplicate worker jobs.
                     if inspect_samples(STATE['samples'])['conflicts']: raise ValueError('同一张照片被标成了不同类别，请先检查并修正标定')  # Block mathematically contradictory supervision rather than pretending additional optimizer passes can fix it.
                     if any(count < 3 for count in inspect_samples(STATE['samples'])['unique_per_class']): raise ValueError('每类至少采集3张不同画面，完全重复的照片不增加有效张数')  # 原始重复张数不能代替各类别的不同训练画面。
@@ -306,7 +323,7 @@ class Handler(SimpleHTTPRequestHandler):  # Combine static assets and a small lo
                     STATE.update(training=True, pace_ms=pace_ms)  # Publish the chosen real training pace before starting the worker.
                     threading.Thread(target=train, args=(STATE['generation'], list(STATE['samples']), STATE['calibration']), daemon=True).start()  # Freeze calibration alongside the samples without blocking HTTP.
                     return self.reply(snapshot())  # Immediately return the new job state.
-                if self.path == '/api/train-control':  # Apply teacher controls to actual optimization rather than just the drawing.
+                if path == '/api/train-control':  # Apply teacher controls to actual optimization rather than just the drawing.
                     if not STATE['training']: raise ValueError('当前没有正在进行的训练')  # Keep completed-history replay separate from live training controls.
                     action = body.get('action')  # Read the explicit pause, resume, step, or speed command.
                     if action == 'pause': STATE.update(paused=True, pause_ack=False, step_budget=0)  # 先请求暂停，到达真实计算边界后才确认已停下。
@@ -315,19 +332,19 @@ class Handler(SimpleHTTPRequestHandler):  # Combine static assets and a small lo
                     elif action == 'pace' and type(body.get('pace_ms')) is int and body['pace_ms'] in [0, 150, 350]: STATE['pace_ms'] = body['pace_ms']  # Update the interval without changing the learning algorithm.
                     else: raise ValueError('训练控制命令无效')  # Reject unsupported or inappropriate state transitions.
                     return self.reply(snapshot())  # Return current live control state to the teacher.
-                if self.path == '/api/predict':  # Run genuine inference with the current trained model.
+                if path == '/api/predict':  # Run genuine inference with the current trained model.
                     if not STATE['ready']: raise ValueError('请先完成训练')  # Never fabricate predictions before training.
                     _, image = decode_image(body.get('image'))  # Decode the same input region used during capture.
                     vector = features(corrected(image, STATE['calibration']))  # Apply exactly the same neutral-reference correction as training.
                     scores = STATE['model'].predict_proba([vector])[0].tolist()  # Obtain scores for the student's three named categories.
                     return self.reply(dict(scores=scores, generation=STATE['generation']))  # Preserve genuine closed-set output for the neural-network learning demonstration.
-                if self.path == '/api/reset':  # 原子清空当前课堂配置中的照片、标定和学习历史。
+                if path == '/api/reset':  # 原子清空当前课堂配置中的照片、标定和学习历史。
                     if 'generation' in body and (type(body['generation']) is not int or body['generation'] != STATE['generation']): raise ValueError('样本已变化，请重新选择删除范围')  # 拒绝跨屏样本变化后的旧清理请求。
                     if 'revision' in body and (type(body['revision']) is not int or body['revision'] != STATE['history_revision']): raise ValueError('检验记录已变化，请重新选择删除范围')  # 独立检验新增时不能沿用旧确认。
                     if body.get('delete_all') and STATE['training']: raise ValueError('请先完成训练，再删除样本')  # 删除入口在实际训练中保持锁定，原有重新教学仍可取消整轮。
                     commit_project(samples=[], calibration=None, runs=[], tests=[], history_revision=STATE['history_revision'] + 1)  # 直接替换活动配置，不另存旧照片文件夹。
                     return self.reply(snapshot(True))  # Return the empty dataset to the interface.
-                if self.path == '/api/delete':  # 按类删除保留历史，明确全部删除则彻底清空当前课堂。
+                if path == '/api/delete':  # 按类删除保留历史，明确全部删除则彻底清空当前课堂。
                     if STATE['training']: raise ValueError('请先完成训练，再删除样本')  # 保证正在学习的照片集合在整轮训练中保持不变。
                     label = body.get('label')  # 接受既有的数值类别，以及明确选择的全部样本范围。
                     if label != 'all' and (type(label) is not int or label not in range(3)): raise ValueError('删除范围无效')  # 缺少范围、布尔值和越界标签都不能触发清理。
@@ -341,11 +358,11 @@ class Handler(SimpleHTTPRequestHandler):  # Combine static assets and a small lo
                     if len(remaining) == len(STATE['samples']): return self.reply(snapshot(True))  # 空类别无需写盘，也不撤销当前有效模型。
                     commit_project(samples=remaining)  # 保存成功后再发布剩余照片和待重训状态，保存失败则完整回滚。
                     return self.reply(snapshot(True))  # 一并更新照片带、质量计数和当前模型状态。
-                if self.path == '/api/names':  # Rename the three classes without changing their numeric labels.
+                if path == '/api/names':  # Rename the three classes without changing their numeric labels.
                     names, _ = validate_project(dict(version=1, names=body.get('names'), samples=[]))  # Reuse project-label validation.
                     commit_project(reset_model=False, names=names)  # Save the new display names without discarding a valid classifier, rolling back on failure.
                     return self.reply(snapshot())  # Refresh labels while preserving the trained classifier.
-                if self.path == '/api/import':  # Restore an exported project for another lesson.
+                if path == '/api/import':  # Restore an exported project for another lesson.
                     names, samples = validate_project(body)  # Validate the complete replacement before touching live data.
                     runs, tests = validate_learning(body.get('learning'), decode_image)  # 兼容旧文件并验证新增的训练历史与固定检验照片。
                     profile = validate_calibration(body.get('calibration'))  # Validate optional reference gains before replacing any project state.
@@ -370,10 +387,10 @@ def main():  # Restore local samples and launch an explicitly selected local or 
         except Exception as error: STATE['error'] = '历史样本未载入：' + str(error)  # Keep a damaged session file for investigation.
     service = None  # Track whether an available local port has been found.
     for port in range(8765, 8796):  # Use another port when an existing application occupies the first one.
-        try: service = LocalServer(('0.0.0.0' if '--lan' in os.sys.argv else '127.0.0.1', port), Handler); break  # Enable the Android panel only in explicitly requested LAN mode.
+        try: service = LocalServer(('0.0.0.0' if LAN_MODE else '127.0.0.1', port), Handler); break  # Enable the Android panel only in explicitly requested LAN mode.
         except OSError: continue  # Try the next local port.
     if service is None: raise RuntimeError('8765—8795端口均不可用')  # Explain the rare case where no local port is available.
-    url = f'http://127.0.0.1:{service.server_port}'  # Construct the actual application address.
+    url = f'http://127.0.0.1:{service.server_port}' + (f'?token={LAN_TOKEN}' if LAN_MODE else '')  # Pass the per-launch token to the local browser when LAN mode is enabled.
     print(f'Learning Desk: {url}', flush=True)  # Make the chosen URL visible in the launch window.
     if '--no-browser' not in os.sys.argv: webbrowser.open(url)  # Open a browser during normal double-click launch.
     try: service.serve_forever()  # Keep the app available until the launch window is closed.
@@ -381,3 +398,4 @@ def main():  # Restore local samples and launch an explicitly selected local or 
     finally: service.server_close()  # Release the listening socket on exit.
 
 if __name__ == '__main__': main()  # Start the application only when invoked as a program.
+

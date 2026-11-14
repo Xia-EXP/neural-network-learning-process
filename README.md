@@ -22,6 +22,8 @@ py -3.12 -m venv .venv
 
 然后打开服务输出的本机地址，通常是 `http://127.0.0.1:8765/`。如果端口被占用，程序会尝试 8766–8795。
 
+如需给同一课堂局域网内的 GM92 或平板访问，使用 `python server.py --lan`。程序会为本次启动生成访问令牌，并把带令牌的地址打印到启动窗口；令牌也可以通过环境变量 `LEARNING_DESK_LAN_TOKEN` 预先指定。不要把带令牌的地址发布到公共网络。
+
 也可以双击 `一键启动.cmd`，但该脚本适合已经准备好本地 Python 环境的开发目录。原始免安装包中的 Python runtime、依赖库和课堂数据未提交到仓库；请使用虚拟环境安装 `requirements.txt`。
 
 ## 模型与许可
@@ -31,4 +33,13 @@ py -3.12 -m venv .venv
 ## 数据隐私
 
 课堂照片、训练历史和当前模型属于本地运行数据。仓库没有提交原始课堂采集数据；程序运行后生成的 `data/session.json`、照片和导出文件也应保持在本地，不要提交到公开仓库。
+
+## 测试
+
+开发依赖安装后运行：
+
+```powershell
+.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.venv\Scripts\python.exe -m pytest -q
+```
 
